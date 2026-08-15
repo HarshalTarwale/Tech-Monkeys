@@ -30,7 +30,7 @@ export function HomeView({
 
   return (
     <>
-      <SiteHeader mode={mode} services={services} />
+      <SiteHeader services={services} />
       <Hero
         divisions={divisions}
         mode={mode}

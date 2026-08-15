@@ -1,5 +1,6 @@
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
-import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
+import { MagneticButton } from "@/components/ui/magnetic-button";
+import { Eyebrow, Shell } from "@/components/ui/shell";
 import { footerNav, site } from "@/lib/content";
 
 /**
@@ -24,12 +25,16 @@ export function Contact() {
               Build something that lasts.
             </ScrollFillText>
           </h2>
-          <a
+          {/* Same magnetic-pull + fill-sweep treatment as the header's
+              "Get in touch", at the "lg" size variant for this section's
+              larger scale. */}
+          <MagneticButton
             href={`mailto:${site.email}`}
-            className="mt-10 inline-flex items-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-medium text-white transition-colors hover:bg-accent"
+            size="lg"
+            className="mt-10"
           >
-            Start a conversation <Arrow />
-          </a>
+            Start a conversation
+          </MagneticButton>
         </div>
 
         <div className="mt-28 grid gap-8 border-t border-line-strong pt-7 text-sm text-muted md:grid-cols-3">

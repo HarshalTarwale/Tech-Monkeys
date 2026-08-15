@@ -33,8 +33,22 @@ export function Tag({ children }: { children: ReactNode }) {
   );
 }
 
-/** Arrow glyph used on links and cards. */
-export function Arrow({ className = "" }: { className?: string }) {
+/**
+ * Arrow glyph used on links and cards, drawn pointing up-right (↗).
+ *
+ * `spin` adds the standard hover treatment used across the site: the arrow
+ * rotates to point straight right (↗ -> →) and nudges outward. It targets
+ * `group-hover`, so the parent link/button needs the Tailwind `group` class.
+ * Pass `spin={false}` (or omit it) for the couple of spots — the project
+ * card arrows — that already carry their own bespoke hover className.
+ */
+export function Arrow({
+  className = "",
+  spin = false,
+}: {
+  className?: string;
+  spin?: boolean;
+}) {
   return (
     <svg
       width="15"
@@ -46,7 +60,7 @@ export function Arrow({ className = "" }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className={className}
+      className={`${spin ? "transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:rotate-45" : ""} ${className}`}
     >
       <path d="M7 17 17 7M7 7h10v10" />
     </svg>

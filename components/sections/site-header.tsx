@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { footerNav, nav, site } from "@/lib/content";
-import type { Segment, Service } from "@/lib/content";
+import type { Service } from "@/lib/content";
 
 /**
  * Fixed translucent header.
@@ -15,13 +15,7 @@ import type { Segment, Service } from "@/lib/content";
  * announced. Items stagger in with a transition-delay — transform and opacity
  * only, so the panel costs no layout.
  */
-export function SiteHeader({
-  mode,
-  services,
-}: {
-  mode: Segment;
-  services: Service[];
-}) {
+export function SiteHeader({ services }: { services: Service[] }) {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -161,9 +155,6 @@ export function SiteHeader({
             320px floor where wordmark + CTA + hamburger exceed the
             available width unless something is allowed to compress. */}
         <div className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-5">
-          <div className="hidden font-mono text-[10px] uppercase tracking-[.14em] text-faint lg:block">
-            TM // {mode}
-          </div>
           <MagneticButton href="#contact" className="shrink-0">
             Get in touch
           </MagneticButton>

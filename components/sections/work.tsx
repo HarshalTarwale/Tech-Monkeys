@@ -65,7 +65,7 @@ export function Work({ projects }: { projects: Project[] }) {
                   <span className="font-mono text-xs uppercase text-accent-deep group-hover:text-white">
                     {project.status === "live" ? "Live" : project.status}
                   </span>
-                  <Arrow className="text-faint group-hover:text-white" />
+                  <Arrow spin className="text-faint group-hover:text-white" />
                 </a>
               ))}
             </div>

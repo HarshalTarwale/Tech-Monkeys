@@ -71,11 +71,14 @@ function DivisionBlock({
             {division.body}
           </p>
 
+          {/* No underline at rest; border-b-2 border-transparent reserves
+              the same 2px of space so the line appearing on hover doesn't
+              nudge anything below it. */}
           <a
             href="#contact"
-            className="mt-9 inline-flex items-center gap-2 border-b-2 border-ink pb-1 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:border-accent hover:text-accent"
+            className="group mt-9 inline-flex items-center gap-2 border-b-2 border-transparent pb-1 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:border-accent hover:text-accent"
           >
-            Engage this division <Arrow />
+            Engage this division <Arrow spin />
           </a>
         </div>
 
@@ -98,7 +101,7 @@ function DivisionBlock({
                     <span className="font-mono text-[10px] uppercase tracking-[.16em] text-accent-deep group-hover:text-white/80">
                       {project.sector}
                     </span>
-                    <Arrow className="text-faint group-hover:text-white" />
+                    <Arrow spin className="text-faint group-hover:text-white" />
                   </div>
 
                   <div>

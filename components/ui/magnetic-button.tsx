@@ -17,14 +17,32 @@ import { Arrow } from "@/components/ui/shell";
  * prefers-reduced-motion; the sweep degrades to a plain colour change via
  * the global reduced-motion rule.
  */
+const SIZES = {
+  // Header CTA scale.
+  md: "h-10 gap-1.5 px-4 text-xs sm:h-11 sm:gap-2 sm:px-6 sm:text-sm",
+  // Closing-CTA scale (contact section).
+  lg: "h-12 gap-2 px-6 text-sm sm:h-14 sm:gap-2.5 sm:px-7 sm:text-base",
+} as const;
+
 export function MagneticButton({
   href,
   children,
   className = "",
+  size = "md",
 }: {
   href: string;
   children: ReactNode;
   className?: string;
+  /**
+   * Fixed size variants rather than free-form height/padding classes in
+   * `className`. Tailwind resolves conflicting utilities (e.g. h-10 vs
+   * h-14) by source order in the generated stylesheet, not by position in
+   * the className string — passing a height override via className was
+   * silently losing to the component's own h-10/h-11 (verified: rendered
+   * at 44px regardless of an h-14 override). A variant prop sidesteps the
+   * conflict entirely since only one size's classes are ever present.
+   */
+  size?: keyof typeof SIZES;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -50,7 +68,7 @@ export function MagneticButton({
       onMouseMove={handleMove}
       onMouseLeave={() => setOffset({ x: 0, y: 0 })}
       style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-      className={`group relative inline-flex h-10 items-center gap-1.5 overflow-hidden rounded-full bg-ink px-4 text-xs font-medium text-white transition-transform duration-300 ease-out sm:h-11 sm:gap-2 sm:px-6 sm:text-sm ${className}`}
+      className={`group relative inline-flex items-center overflow-hidden rounded-full bg-ink font-medium text-white transition-transform duration-300 ease-out ${SIZES[size]} ${className}`}
     >
       {/* Accent disc that sweeps up to fill the pill. */}
       <span
@@ -71,7 +89,7 @@ export function MagneticButton({
         </span>
       </span>
 
-      <Arrow className="relative z-10 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      <Arrow spin className="relative z-10" />
     </a>
   );
 }

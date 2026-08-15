@@ -46,6 +46,39 @@ asked for dark-first. Flagged for the client — see docs/homepage-spec.md.
 - Hover: rows/cards fill `--tm-accent`, all child text inverts to white
 - `.loop-mark`: 1px accent border, `border-radius: 50% 48% 50% 46%`, dual inset/outer glow
 
+## Arrow + link hover pattern
+
+Standardised across every "→" glyph on the site (`components/ui/shell.tsx`,
+the `Arrow` component's `spin` prop):
+
+- Idle: arrow points up-right (its native ↗ path).
+- Hover: rotates 45° to point straight right (→) and nudges outward
+  (`translate-x-0.5`). Verified the rotation direction visually before
+  shipping — the glyph's diagonal and CSS rotation direction are easy to
+  get backwards from arithmetic alone.
+
+Applied to: header "Get in touch", "Engage this division", "Start a
+conversation", and both project-card arrows (division cards, ledger rows).
+
+**Text links with an arrow** ("Engage this division") also gained an
+underline-on-hover: idle state is `border-b-2 border-transparent` (reserves
+the same 2px so the line appearing on hover causes no shift), hover is
+`border-accent`.
+
+**"Start a conversation"** was a plain filled pill; converted to
+`MagneticButton` (the same component as the header's "Get in touch") so it
+gets the same magnetic pull and fill-sweep. Needed a `size` variant prop
+(`md` | `lg`) rather than a height override via `className` — Tailwind
+resolves conflicting utilities (`h-10` vs `h-14`) by source order in the
+compiled stylesheet, not by position in the className string, so an
+`h-14` passed through `className` was silently losing to the component's
+own `h-10`/`sm:h-11` (verified: rendered at 44px regardless of the
+override). The size variant sidesteps the conflict — only one size's
+classes exist in the markup at a time.
+
+`TM // {mode}` removed from the header per client request; the `mode` prop
+was dropped from `SiteHeader`'s interface rather than left dead.
+
 ## Capabilities row hover
 
 Replaced the accent colour-fill hover (design reference default) with a
