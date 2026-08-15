@@ -46,6 +46,33 @@ asked for dark-first. Flagged for the client — see docs/homepage-spec.md.
 - Hover: rows/cards fill `--tm-accent`, all child text inverts to white
 - `.loop-mark`: 1px accent border, `border-radius: 50% 48% 50% 46%`, dual inset/outer glow
 
+## Hero segment-word crossfade
+
+The highlighted word in the hero ("...for startups/corporates/enterprises")
+originally hard-swapped via a React `key` + a one-shot CSS `pop` keyframe —
+functional but felt raw, no sense of one word replacing another.
+
+Rebuilt as a masked vertical crossfade using Motion's `AnimatePresence`
+(`mode="popLayout"`): the outgoing word slides up and fades while the
+incoming one slides in from below, both clipped inside the accent block via
+`overflow-hidden`. Reuses the same masked-label technique already used on
+`MagneticButton`, so the site has one consistent "words replace each other"
+motion language rather than a second bespoke effect.
+
+The accent block itself carries Motion's `layout` prop, so its width
+animates between word lengths ("startups" -> "enterprises") instead of
+snapping. Confirmed by sampling the block's rendered width every ~35ms
+during a transition: 490 -> 529 -> 543 -> 547 -> 548px, a genuine eased
+expansion, not a jump — a still screenshot mid-transition can look like a
+snap even when the underlying animation is smooth, so this was checked by
+measurement, not just by eye.
+
+Reduced motion: `useReducedMotion()` drops `layout` on the block and the
+enter/exit offsets on the word, so `AnimatePresence` falls back to
+`mode="wait"` and the switch is instant with no residual "ghost" word.
+Verified via the actual rendered `h1` text immediately after a click under
+`reducedMotion: "reduce"`.
+
 ## Arrow + link hover pattern
 
 Standardised across every "→" glyph on the site (`components/ui/shell.tsx`,

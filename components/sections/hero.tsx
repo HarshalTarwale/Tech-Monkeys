@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
 import type { Division, Segment } from "@/lib/content";
 import { Marquee } from "@/components/ui/marquee";
 
@@ -7,12 +9,20 @@ import { Marquee } from "@/components/ui/marquee";
  * Full-height hero.
  *
  * The headline ends on a segment word set on an accent block; the switcher
- * below swaps it. The `key` on that span re-triggers the `pop` keyframe on
- * every change.
+ * below swaps it.
+ *
+ * The swap is a masked vertical crossfade, not a hard cut: the outgoing word
+ * slides up and fades while the incoming one slides in from below, both
+ * clipped inside the accent block via `overflow-hidden` on its wrapper so
+ * neither is ever visible outside it. AnimatePresence's `popLayout` mode
+ * measures both words and animates the block's width between them, so the
+ * highlight resizes to fit "startups" vs "enterprises" smoothly instead of
+ * snapping. Reused from the same masked-label technique already used on
+ * MagneticButton, for one consistent motion language across the site.
  *
  * LCP note: this is a Server-rendered subtree hydrated in place — the text is
- * in the HTML on first paint. The only motion is the `pop` on the highlight
- * word, which never moves surrounding layout (fixed line box, transform only).
+ * in the HTML on first paint. The word-swap only ever fires after a user
+ * clicks the switcher, so it can't gate the first paint.
  */
 export function Hero({
   divisions,
@@ -26,6 +36,7 @@ export function Hero({
   marqueeItems: string[];
 }) {
   const active = divisions.find((d) => d.segment === mode) ?? divisions[0];
+  const reduced = useReducedMotion();
 
   return (
     <section
@@ -58,12 +69,24 @@ export function Hero({
           Building digital
           <br />
           momentum for{" "}
-          <span
-            key={active.segment}
-            className="-my-1 inline-block animate-[pop_.4s_ease-out] bg-accent px-3 text-white"
+          <motion.span
+            layout={!reduced}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="-my-1 relative inline-flex h-[1em] items-center overflow-hidden bg-accent px-3 align-baseline"
           >
-            {active.name.toLowerCase()}
-          </span>
+            <AnimatePresence mode={reduced ? "wait" : "popLayout"} initial={false}>
+              <motion.span
+                key={active.segment}
+                initial={reduced ? false : { y: "60%", opacity: 0 }}
+                animate={{ y: "0%", opacity: 1 }}
+                exit={reduced ? undefined : { y: "-60%", opacity: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="inline-block whitespace-nowrap text-white"
+              >
+                {active.name.toLowerCase()}
+              </motion.span>
+            </AnimatePresence>
+          </motion.span>
         </h1>
 
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
