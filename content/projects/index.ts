@@ -100,7 +100,7 @@ export const projects: Project[] = [
     tags: ["Platform", "QR", "Ops"],
     url: "https://cloak-bice.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "continental-premium-properties",
@@ -221,7 +221,7 @@ export const projects: Project[] = [
     tags: ["Web", "Fleet"],
     url: "https://autobreezecarrental.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "vedic-group",
@@ -257,7 +257,7 @@ export const projects: Project[] = [
     tags: ["Web", "Motion"],
     url: "https://mindforge-marketing.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "copilot-labs",
@@ -281,7 +281,7 @@ export const projects: Project[] = [
     tags: ["E-commerce", "Stripe"],
     url: "https://neuro-holistic.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
     featured: true,
   },
   {

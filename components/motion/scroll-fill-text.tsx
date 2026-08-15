@@ -79,7 +79,12 @@ export function ScrollFillText({
   }, [anchor]);
 
   const { scrollYProgress } = useScroll({
-    target: ref,
+    // Under reduced motion this component renders a plain <span> with no
+    // ref attached, so passing `ref` here left Motion watching a target
+    // that never hydrates ("Target ref is defined but not hydrated").
+    // Dropping the target in that branch keeps the hook call unconditional
+    // (rules of hooks) without pointing it at an element that never exists.
+    target: reduced ? undefined : ref,
     // Start as the line clears the fold; finish once it crosses the
     // vertical centre of the screen, so by the time a reader's eye meets
     // the line it is already fully black. For a final-section heading,

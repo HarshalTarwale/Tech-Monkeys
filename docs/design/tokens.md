@@ -46,6 +46,136 @@ asked for dark-first. Flagged for the client — see docs/homepage-spec.md.
 - Hover: rows/cards fill `--tm-accent`, all child text inverts to white
 - `.loop-mark`: 1px accent border, `border-radius: 50% 48% 50% 46%`, dual inset/outer glow
 
+## Division project previews: live-site iframes
+
+Each division shows 1-3 real projects as full-width cards containing a live
+iframe preview of the actual deployed site, wrapped in a fake browser-chrome
+frame (traffic-light dots + a URL bar reading the project's real domain).
+Chosen over static screenshots because every project already carries a
+working `url` (see docs/project-inventory-verified.md), so this needs no
+image uploads, can never go stale the way a screenshot would, and reads as
+proof rather than a mockup.
+
+Component: `components/ui/live-preview-card.tsx`. Layout: vertical stack,
+full width (`components/sections/divisions.tsx`, `MAX_PREVIEWS = 3`) — a
+2-column grid was considered and rejected, since an iframe needs real width
+to read as an actual website rather than a postage stamp.
+
+Three real risks, each mitigated deliberately:
+
+1. **Performance.** Up to 9 cross-origin iframes could exist on the page (3
+   divisions x 3 projects). Each only mounts once its card crosses an
+   `IntersectionObserver` threshold (`rootMargin: 200px`) — confirmed zero
+   iframes exist in the DOM immediately after page load, before scrolling
+   near them.
+2. **Scroll/click hijacking.** An iframe without `pointer-events: none` lets
+   the embedded site capture the page's own scroll wheel the moment the
+   cursor is over a card. Fixed with `pointer-events-none` on the iframe
+   itself plus a transparent overlay div; the whole card is one `<a>` to the
+   project's real URL, so a click still navigates correctly.
+3. **Silent embed failure.** A project's site could add `X-Frame-Options`
+   at any time, or go offline — and a blocked iframe fires no `onError`, it
+   just renders blank. A 6-second load timeout without an `onLoad` fires
+   flips to the plain-text fallback card (sector + name), so the section
+   can never show an empty box. Verified live: all six checked project
+   domains (Vercel defaults) send no frame-blocking headers today, but the
+   fallback exists because that can change without our involvement.
+
+Verified end-to-end with three projects temporarily flagged
+`nameApproved: true` for visual QA (Cloak, AutoBreeze, NeuroHolistic — all
+in the Startups division), then reverted. With those flags on: iframes
+rendered the real live sites correctly on both desktop and 390px mobile, no
+horizontal overflow, hover darkens the border with a shadow lift consistent
+with the site's existing hover language, and previews still load under
+`prefers-reduced-motion` (they are content, not decorative motion). With the
+flags off (the real, current state): the section correctly falls back to
+the existing "being prepared for publication" placeholder — confirmed by
+reading the rendered HTML.
+
+**Nothing is visible today.** All 25 projects in `content/projects/index.ts`
+are still `nameApproved: false`; every division renders the placeholder
+until the client clears specific projects for public use. See
+docs/project-inventory-verified.md for the list to review.
+
+## Project showcase: hover-to-activate + browser-chrome redesign
+
+Two follow-up changes to the card-deck showcase, both from direct client
+feedback on the click-to-activate version.
+
+**Hover instead of click.** Click-to-activate was deliberate (a permanently
+interactive iframe steals the page's scroll the instant the cursor crosses
+it), but the client wanted automatic control on cursor-enter. Implemented as
+`onPointerEnter`/`onPointerLeave` on the stage rather than a sticky
+click-to-open: control engages the moment the cursor enters the window and
+releases the moment it leaves, so a visitor scrolling past the section with
+the cursor still over it recovers control as soon as the cursor tracks off
+the window - the same safety property click-to-activate had, without
+requiring a click. Escape stays as a keyboard-only fallback.
+
+Gated to `(hover: hover) and (pointer: fine)` - touch has no hover event to
+activate or release with, so touch keeps a tap-to-activate fallback button
+underneath the pointer handlers. Checked with a lazy `useState` initialiser,
+not a `useEffect` (the effect version was flagged by
+`react-hooks/set-state-in-effect` - setState in an effect body causes an
+avoidable second render), guarded for `typeof window !== "undefined"` since
+"use client" does not exempt a component from the initial SSR render pass.
+
+Verified: `pointer-events` on the iframe flips `none -> auto` on enter and
+back to `none` on leave, confirmed by reading the computed style directly
+after each transition (not just visually) - and confirmed the same cycle
+still works via `.hover()`/mouse-move-to-coordinates in Playwright, after an
+initial false negative traced to imprecise synthetic coordinates rather than
+a real bug.
+
+**Browser-chrome redesign.** The first chrome bar (flat grey dots, a plain
+pill for the URL) didn't read as "a real browser" at a glance. Rebuilt with:
+real macOS-style traffic-light colours (`#ff5f57` / `#febc2e` / `#28c840`,
+not grey), a proper address-bar shape with a lock icon, and a dark
+(`#2a2a2e`) chrome bar rather than the site's own bone tone - the same
+visual separation a real OS browser uses to distinguish its own frame from
+page content. The state badge gained a pulsing dot and switched from plain
+text colour to a filled pill matching the accent when live. The whole window
+gained a deeper shadow and, when active, an accent-coloured border and glow
+so "you are now in control" is unambiguous at a glance.
+
+## Live-preview card redesign: full card -> compact row
+
+The first version of `LivePreviewCard` was a full-width card with a 16:10
+iframe window (~500px tall). Stacked 3 deep in a division's right column,
+that overshot the left column's natural text height (~425px, measured) by
+roughly 4x — the division block visibly bled past its own bottom divider,
+spilling into the next division's border. Caught from client feedback with
+a screenshot showing the overflow directly against the block's black
+divider lines.
+
+Root cause: the two columns sit in a CSS grid, and a grid row's height is
+set by its tallest child. Three full-size cards structurally could not fit
+beside four lines of body copy no matter how the spacing was tuned — this
+needed a different card shape, not smaller margins.
+
+Redesigned as a horizontal row: a fixed `aspect-square` thumbnail
+(~96-112px) plus sector/name/scope stacked beside it, three rows separated
+by hairline dividers. Three rows now total roughly the same height as the
+text column next to them. The iframe crop math changed to match — scaled
+~5x and cropped to just its top-left fragment (logo/nav/hero corner) rather
+than shrunk to fit the whole page, since a whole live page rendered at
+100px would be an unreadable smear; a cropped fragment at a size closer to
+native reads as "yes, this is a real site" even this small.
+
+The three risk mitigations from the original design carry over unchanged:
+IntersectionObserver-gated mounting, a load timeout falling back to a
+sector-only placeholder, and (implicitly, since the iframe is
+`pointer-events-none` and the row-not-card structure means no scroll-shield
+div is needed at this size) no scroll hijacking.
+
+Verified with the same 3 projects (Cloak, AutoBreeze, NeuroHolistic)
+temporarily approved for visual QA, then reverted — confirmed no overflow
+past the block's divider on desktop, tablet, and phone (320-3440px), hover
+darkens the arrow to accent and tints the row background, and reduced
+motion still loads the previews (they are content, not decorative motion).
+Real content state (all 25 projects `nameApproved: false`) verified to
+still render the "being prepared for publication" placeholder correctly.
+
 ## Hero segment-word crossfade
 
 The highlighted word in the hero ("...for startups/corporates/enterprises")

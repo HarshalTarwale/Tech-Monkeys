@@ -9,8 +9,12 @@ import {
 } from "motion/react";
 
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
-import { Arrow, Eyebrow, Shell, Tag } from "@/components/ui/shell";
+import { ProjectShowcase } from "@/components/ui/project-showcase";
+import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
 import type { Division, Project } from "@/lib/content";
+
+/** Cap per division — 1-4 proof points, cycled in the showcase carousel. */
+const MAX_PREVIEWS = 4;
 
 /**
  * One division block: oversized name on one side, that segment's projects on
@@ -83,49 +87,23 @@ function DivisionBlock({
         </div>
 
         <div className={flipped ? "lg:order-1" : ""}>
-          <div className="mb-5 font-mono text-[10px] uppercase tracking-[.2em] text-faint">
-            Selected engagements
-          </div>
-
           {projects.length > 0 ? (
-            <div className="grid gap-px border border-line bg-line sm:grid-cols-2">
-              {projects.map((project) => (
-                <a
-                  key={project.slug}
-                  href={project.url ?? "#contact"}
-                  target={project.url ? "_blank" : undefined}
-                  rel={project.url ? "noreferrer" : undefined}
-                  className="group flex min-h-[210px] flex-col justify-between bg-surface p-6 transition-colors hover:bg-accent"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-[.16em] text-accent-deep group-hover:text-white/80">
-                      {project.sector}
-                    </span>
-                    <Arrow spin className="text-faint group-hover:text-white" />
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-semibold tracking-[-.03em] text-ink group-hover:text-white">
-                      {project.name}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted group-hover:text-white/85">
-                      {project.scope}
-                    </p>
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap gap-1.5">
-                    {project.tags.map((tag) => (
-                      <Tag key={tag}>{tag}</Tag>
-                    ))}
-                  </div>
-                </a>
-              ))}
-            </div>
+            // One large interactive window with a card-deck carousel, rather
+            // than a stack of small cards: a live site needs real size to
+            // read as a real site, and only the active card's iframe is
+            // mounted so a division never holds more than one frame.
+            <ProjectShowcase projects={projects.slice(0, MAX_PREVIEWS)} />
           ) : (
-            /* Nothing approved for public use in this division yet. */
-            <div className="border border-dashed border-line-strong bg-surface/50 p-6 text-sm leading-relaxed text-faint">
-              Engagements for this division are being prepared for publication.
-            </div>
+            <>
+              <div className="mb-5 font-mono text-[10px] uppercase tracking-[.2em] text-faint">
+                Selected engagements
+              </div>
+              {/* Nothing approved for public use in this division yet. */}
+              <div className="border border-dashed border-line-strong bg-surface/50 p-6 text-sm leading-relaxed text-faint">
+                Engagements for this division are being prepared for
+                publication.
+              </div>
+            </>
           )}
         </div>
       </div>
