@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------
+   Design tokens — measured from the approved design reference.
+   See docs/design/tokens.md for provenance.
+   Light-first, per client confirmation (2026-08-15).
+   --------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --tm-ink: #141416;
+  --tm-accent: #3d5afe;
+  --tm-accent-deep: #2a3fcc;
+  --tm-bone: #f3f2ee;
+  --tm-surface: #ffffff;
+  --tm-muted: #5a5a60;
+  --tm-faint: #9a9aa0;
+
+  --tm-line: color-mix(in srgb, var(--tm-ink) 10%, transparent);
+  --tm-line-strong: color-mix(in srgb, var(--tm-ink) 15%, transparent);
+
+  --font-mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  --tm-shell: 1600px;
+  --radius: 0.25rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--tm-ink);
+  --color-accent: var(--tm-accent);
+  --color-accent-deep: var(--tm-accent-deep);
+  --color-bone: var(--tm-bone);
+  --color-surface: var(--tm-surface);
+  --color-muted: var(--tm-muted);
+  --color-faint: var(--tm-faint);
+  --color-line: var(--tm-line);
+  --color-line-strong: var(--tm-line-strong);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono-stack);
+
+  --spacing-shell: var(--tm-shell);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* vw-based display type can exceed the viewport once a scrollbar is
+     present. Clip on both html and body: clipping html alone still leaves
+     body reporting a wider scrollWidth at some breakpoints. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  body {
+    background: var(--tm-bone);
+    color: var(--tm-ink);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Lenis drives scroll; only opt in once it has mounted so the page
+     still scrolls natively if JS fails or motion is reduced. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Mono label above every section heading. */
+  .eyebrow {
+    font-family: var(--font-mono-stack);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--tm-accent-deep);
+  }
+}
+
+/* --- Motion primitives, matched to the design reference. --- */
+
+/* Hero highlight word. */
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Logo band. Track is duplicated in markup, so -50% loops seamlessly. */
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+  100% {
+    transform: translate(-50%);
+  }
+}
+
+/* Rotating mark in the capabilities panel. */
+.loop-mark {
+  border: 1px solid var(--tm-accent);
+  border-radius: 50% 48% 50% 46%;
+  box-shadow:
+    inset 0 0 35px #3d5afe1f,
+    0 0 32px #3d5afe1f;
+  position: relative;
+}
+
+.loop-mark::after {
+  content: "";
+  position: absolute;
+  inset: 23%;
+  border: 1px solid rgb(224 224 226 / 0.5);
+  border-radius: 46% 52% 48% 50%;
+}
+
+/* Scroll-scrubbed heading fill (see components/motion/scroll-fill-text.tsx).
+   The clip lives here rather than inline so the reduced-motion fallback can
+   win in CSS — a JS-only guard can paint transparent text for one frame
+   before hydration resolves. */
+.scroll-fill {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fill {
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    background-image: none !important;
+    color: var(--tm-faint);
+  }
+}
+
+/* Film grain over the hero. Pure CSS, no image request. */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --- Motion constraint: honoured globally, non-negotiable. --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-marquee {
+    animation: none !important;
+  }
 }
