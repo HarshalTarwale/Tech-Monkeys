@@ -56,10 +56,10 @@ export function SiteHeader({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bone/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-shell items-center justify-between px-5 md:px-10">
+      <div className="mx-auto flex h-16 max-w-shell items-center justify-between gap-3 px-4 sm:px-5 md:px-10">
         <a
           href="#top"
-          className="text-sm font-semibold tracking-[.12em] text-ink sm:text-base sm:tracking-[.16em]"
+          className="shrink-0 whitespace-nowrap text-xs font-semibold tracking-[.06em] text-ink sm:text-base sm:tracking-[.16em]"
           aria-label={`${site.name} — back to top`}
         >
           {site.wordmark}
@@ -156,7 +156,11 @@ export function SiteHeader({
           )}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+        {/* min-w-0 lets this flex item actually shrink below its content
+            size instead of forcing the row to overflow — needed at the
+            320px floor where wordmark + CTA + hamburger exceed the
+            available width unless something is allowed to compress. */}
+        <div className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-5">
           <div className="hidden font-mono text-[10px] uppercase tracking-[.14em] text-faint lg:block">
             TM // {mode}
           </div>
@@ -170,7 +174,7 @@ export function SiteHeader({
             onClick={() => setMobileOpen((v) => !v)}
             aria-expanded={mobileOpen}
             aria-label="Toggle menu"
-            className="flex h-9 w-9 flex-col items-center justify-center gap-1.25 md:hidden"
+            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-1.25 md:hidden"
           >
             <span
               className={`block h-px w-5 bg-ink transition-transform duration-300 ${mobileOpen ? "translate-y-0.75 rotate-45" : ""}`}

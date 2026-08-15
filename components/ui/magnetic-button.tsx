@@ -50,7 +50,7 @@ export function MagneticButton({
       onMouseMove={handleMove}
       onMouseLeave={() => setOffset({ x: 0, y: 0 })}
       style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-      className={`group relative inline-flex h-11 items-center gap-2 overflow-hidden rounded-full bg-ink px-5 text-sm sm:px-6 font-medium text-white transition-transform duration-300 ease-out ${className}`}
+      className={`group relative inline-flex h-10 items-center gap-1.5 overflow-hidden rounded-full bg-ink px-4 text-xs font-medium text-white transition-transform duration-300 ease-out sm:h-11 sm:gap-2 sm:px-6 sm:text-sm ${className}`}
     >
       {/* Accent disc that sweeps up to fill the pill. */}
       <span

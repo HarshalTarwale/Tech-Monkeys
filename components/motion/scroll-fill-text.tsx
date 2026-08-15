@@ -80,16 +80,19 @@ export function ScrollFillText({
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    // Start as the line clears the fold; end either at the reading zone or,
-    // for a final-section heading, at the furthest point it can reach.
-    offset: ["start 0.95", endOffset ?? "start 0.25"],
+    // Start as the line clears the fold; finish once it crosses the
+    // vertical centre of the screen, so by the time a reader's eye meets
+    // the line it is already fully black. For a final-section heading,
+    // finish at the furthest point it can reach instead.
+    offset: ["start 0.95", endOffset ?? "start 0.5"],
   });
 
-  // Smooths flick-scrolls into a glide. Not a delay — it still tracks the
-  // scrub, it just refuses to jitter.
+  // Smooths flick-scrolls into a glide without lagging behind the scrub —
+  // stiff enough to feel tied to scroll speed, damped enough not to
+  // overshoot into a bounce.
   const eased = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 30,
+    stiffness: 260,
+    damping: 32,
     restDelta: 0.001,
   });
 

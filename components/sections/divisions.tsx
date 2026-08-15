@@ -48,9 +48,15 @@ function DivisionBlock({
             <span>Division</span>
           </div>
 
+          {/* clamp, not plain vw: unclamped 8vw hit 150px+ on a 2560px
+              desktop, out of proportion to the rest of the page. Ceiling
+              raised to 150px here (vs. the hero's 110px) since this line is
+              a single short word with room either side, not a two-line
+              phrase that risks wrapping. Floor matches the hero's mobile
+              anchor. */}
           <motion.h2
             style={{ x }}
-            className="text-[13vw] font-black leading-[.82] tracking-[-.06em] text-ink lg:text-[8vw]"
+            className="text-[clamp(2.625rem,0.696rem+9.643vw,9.375rem)] font-black leading-[.82] tracking-[-.06em] text-ink"
           >
             {division.name}
           </motion.h2>

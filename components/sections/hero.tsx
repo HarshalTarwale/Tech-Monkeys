@@ -30,18 +30,31 @@ export function Hero({
   return (
     <section
       id="top"
-      className="grain relative flex min-h-screen flex-col justify-between px-5 pb-10 pt-28 md:px-10"
+      // h-screen (not min-h-screen) so max-h actually takes effect: with
+      // min-height, min always wins over a smaller max-height per the CSS
+      // spec, so min-h-screen + max-h silently ignored the cap on
+      // ultrawide/4K screens (measured: still rendered at a full 1440px).
+      // height + max-height caps it correctly there while still filling
+      // the viewport on any screen shorter than the cap.
+      className="grain relative flex h-screen max-h-225 flex-col justify-between px-5 pb-10 pt-28 md:px-10"
     >
       <div className="relative z-10 mx-auto w-full max-w-shell">
         <div className="mb-8 font-mono text-xs uppercase tracking-[.22em] text-accent-deep">
           Digital product partner · UAE
         </div>
 
-        {/* Sized so the longest segment word ("enterprises") still sits on
-            line two. Measured at 1440px: 8vw wraps to a third line, 7vw
-            fits — 6.8vw leaves headroom while fonts settle. The size is
-            fixed rather than per-word so switching never reflows the page. */}
-        <h1 className="text-[10.5vw] font-black leading-[.9] tracking-[-.045em] text-ink md:text-[6.8vw]">
+        {/* clamp(floor, fluid, ceiling), not plain vw — vw alone has no
+            upper or lower bound, so it read as oversized on 2560px+/
+            ultrawide monitors and cramped below ~360px. Anchors are
+            measured, not guessed: 34px at a 320px viewport is the smallest
+            size that keeps "enterprises" (the longest segment word) clear
+            of the edge; 110px is the largest that still keeps it on line
+            two at the shell's full 1600px width (8vw wraps to a 3rd line
+            there; 110px is the ceiling before that happens). The fluid
+            middle term passes through the previously-tuned 98px at 1440px,
+            so desktop is visually unchanged. Fixed per render, not
+            per-word, so switching segments never reflows the page. */}
+        <h1 className="text-[clamp(2.125rem,0.982rem+5.714vw,6.875rem)] font-black leading-[.9] tracking-[-.045em] text-ink">
           Building digital
           <br />
           momentum for{" "}
