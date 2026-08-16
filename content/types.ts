@@ -22,7 +22,9 @@ export type ServiceCategory =
   | "ai"
   | "brand"
   | "seo"
-  | "cloud";
+  | "cloud"
+  | "consulting"
+  | "video";
 
 /** Publication gate, not a client-facing label. */
 export type ProjectStatus = "live" | "delivered" | "in-progress" | "unverified";
@@ -70,6 +72,22 @@ export interface Service {
    * linking a prospect to an empty case-study grid; not a capability claim.
    */
   hasWork: boolean;
+}
+
+/**
+ * Full content for a service's own detail page (`/services/[slug]`).
+ * Only written for services with real work to point to — see
+ * `content/services/details.ts`. A service without an entry here has no
+ * detail page; `getServiceDetail` returns undefined and the route 404s.
+ */
+export interface ServiceDetail {
+  slug: ServiceCategory;
+  /** Paragraph under the page's headline, expanding on the Service summary. */
+  intro: string;
+  /** "What's included" grid: 5-6 concrete facets of the service. */
+  highlights: { title: string; body: string }[];
+  /** "How we work" steps, in order. */
+  process: { title: string; body: string }[];
 }
 
 export interface Testimonial {

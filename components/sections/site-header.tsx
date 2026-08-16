@@ -1,21 +1,33 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { footerNav, nav, site } from "@/lib/content";
-import type { Service } from "@/lib/content";
+import type { Service, ServiceCategory } from "@/lib/content";
 
 /**
  * Fixed translucent header.
  *
- * "Services" opens a panel listing all eight services. It opens on hover for
+ * "Services" opens a panel listing all ten services. It opens on hover for
  * pointer users and on click/Enter for keyboard and touch, closes on Escape
  * or outside click, and the trigger carries aria-expanded so the state is
  * announced. Items stagger in with a transition-delay — transform and opacity
  * only, so the panel costs no layout.
+ *
+ * `serviceDetailSlugs` marks which services have a written detail page
+ * (currently just "web") — those link straight to `/services/[slug]`, the
+ * rest fall back to the `#capabilities` anchor. Detail pages are being built
+ * one at a time, so this list grows without any other change here.
  */
-export function SiteHeader({ services }: { services: Service[] }) {
+export function SiteHeader({
+  services,
+  serviceDetailSlugs = [],
+}: {
+  services: Service[];
+  serviceDetailSlugs?: ServiceCategory[];
+}) {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -51,14 +63,14 @@ export function SiteHeader({ services }: { services: Service[] }) {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bone/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-shell items-center justify-between gap-3 px-4 sm:px-5 md:px-10">
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="shrink-0 whitespace-nowrap text-xs font-semibold tracking-[.06em] text-ink sm:text-base sm:tracking-[.16em]"
           aria-label={`${site.name} — back to top`}
         >
           {site.wordmark}
           <span className="text-accent">.</span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {nav.map((item) =>
@@ -114,7 +126,11 @@ export function SiteHeader({ services }: { services: Service[] }) {
                       {services.map((service, i) => (
                         <li key={service.slug}>
                           <a
-                            href="#capabilities"
+                            href={
+                              serviceDetailSlugs.includes(service.slug)
+                                ? `/services/${service.slug}`
+                                : "/#capabilities"
+                            }
                             onClick={() => setOpen(false)}
                             style={{
                               transitionDelay: open ? `${i * 28}ms` : "0ms",
@@ -155,7 +171,7 @@ export function SiteHeader({ services }: { services: Service[] }) {
             320px floor where wordmark + CTA + hamburger exceed the
             available width unless something is allowed to compress. */}
         <div className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-5">
-          <MagneticButton href="#contact" className="shrink-0">
+          <MagneticButton href="/#contact" className="shrink-0">
             Get in touch
           </MagneticButton>
 
@@ -199,7 +215,11 @@ export function SiteHeader({ services }: { services: Service[] }) {
             {services.map((service) => (
               <a
                 key={service.slug}
-                href="#capabilities"
+                href={
+                  serviceDetailSlugs.includes(service.slug)
+                    ? `/services/${service.slug}`
+                    : "/#capabilities"
+                }
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 bg-bone px-1 py-2.5 text-sm text-ink"
               >

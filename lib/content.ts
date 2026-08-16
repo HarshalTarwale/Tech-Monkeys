@@ -1,5 +1,6 @@
 import { divisions, projects } from "@/content/projects";
 import { services } from "@/content/services";
+import { serviceDetails } from "@/content/services/details";
 import { footerNav, nav, site } from "@/content/site";
 import type {
   Division,
@@ -7,6 +8,7 @@ import type {
   Segment,
   Service,
   ServiceCategory,
+  ServiceDetail,
   Testimonial,
 } from "@/content/types";
 
@@ -83,6 +85,16 @@ export function getService(slug: ServiceCategory): Service | undefined {
   return services.find((s) => s.slug === slug);
 }
 
+/** Detail-page content for a service. Undefined if that service has no page yet. */
+export function getServiceDetail(slug: ServiceCategory): ServiceDetail | undefined {
+  return serviceDetails[slug];
+}
+
+/** Slugs with a written detail page — drives generateStaticParams for /services/[slug]. */
+export function getServiceDetailSlugs(): ServiceCategory[] {
+  return Object.keys(serviceDetails) as ServiceCategory[];
+}
+
 export function getDivisions(): Division[] {
   return divisions;
 }
@@ -106,5 +118,6 @@ export type {
   Segment,
   Service,
   ServiceCategory,
+  ServiceDetail,
   Testimonial,
 };

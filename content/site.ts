@@ -18,20 +18,26 @@ export const site = {
 } as const;
 
 /**
- * Primary navigation. "Services" opens a dropdown listing all eight
+ * Primary navigation. "Services" opens a dropdown listing all ten
  * services; the rest are section anchors.
+ *
+ * Hrefs are home-relative (`/#section`), not bare hashes — the site now has
+ * subpages (`/services/[slug]`), and a bare `#section` href only resolves
+ * against whatever route it's rendered on. `/#section` works identically on
+ * `/` itself (same-document anchor scroll, no reload) and correctly
+ * navigates back to the homepage section from anywhere else.
  */
 export const nav = [
-  { label: "Services", href: "#capabilities", hasDropdown: true },
-  { label: "Projects", href: "#work" },
-  { label: "About", href: "#divisions" },
-  { label: "Contact", href: "#contact" },
+  { label: "Services", href: "/#capabilities", hasDropdown: true },
+  { label: "Projects", href: "/#work" },
+  { label: "About", href: "/#divisions" },
+  { label: "Contact", href: "/#contact" },
 ] as const;
 
 /** Footer link list. Plain anchors, no dropdown. */
 export const footerNav = [
-  { label: "Services", href: "#capabilities" },
-  { label: "Projects", href: "#work" },
-  { label: "About", href: "#divisions" },
-  { label: "Contact", href: "#contact" },
+  { label: "Services", href: "/#capabilities" },
+  { label: "Projects", href: "/#work" },
+  { label: "About", href: "/#divisions" },
+  { label: "Contact", href: "/#contact" },
 ] as const;

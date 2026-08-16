@@ -52,7 +52,7 @@ export function Capabilities({ services }: { services: Service[] }) {
               <ScrollFillText>Every layer of the build.</ScrollFillText>
             </h2>
             <p className="mt-6 max-w-sm leading-relaxed text-muted">
-              Eight services, delivered by the same people from first sketch
+              Ten services, delivered by the same people from first sketch
               to production support.
             </p>
             <motion.div

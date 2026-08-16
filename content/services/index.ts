@@ -1,7 +1,7 @@
 import type { Service } from "../types";
 
 /**
- * The eight services Tech Monkeys offers.
+ * The ten services Tech Monkeys offers.
  *
  * Copy is original to Tech Monkeys.
  *
@@ -10,6 +10,13 @@ import type { Service } from "../types";
  * the flag exists so surfaces that promise case studies — filters, category
  * grids — can avoid sending a prospect to an empty page. It is not a
  * statement about capability.
+ *
+ * Strategic & Digital Consulting and Video & Film Services (09, 10) were
+ * added to match the competitor's full service count at the client's
+ * explicit request, with no portfolio evidence behind either yet — the
+ * client's own words: "if client want to remove we will remove it later."
+ * Both carry `hasWork: false` for that reason. Revisit once real
+ * engagements exist, or if the client decides to drop them.
  */
 export const services: Service[] = [
   {
@@ -74,6 +81,22 @@ export const services: Service[] = [
     title: "Cloud, Hosting & Support",
     summary:
       "Deployment, monitoring and maintenance that keep what we build fast and online.",
+    hasWork: false,
+  },
+  {
+    slug: "consulting",
+    index: "09",
+    title: "Strategic & Digital Consulting",
+    summary:
+      "Roadmapping and technical direction for teams deciding what to build before they build it.",
+    hasWork: false,
+  },
+  {
+    slug: "video",
+    index: "10",
+    title: "Video & Film Services",
+    summary:
+      "Product, brand and campaign film built to sit inside the same launch as the site.",
     hasWork: false,
   },
 ];

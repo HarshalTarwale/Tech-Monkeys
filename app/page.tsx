@@ -6,6 +6,7 @@ import {
   getFeaturedProjects,
   getMarqueeItems,
   getProjectsBySegment,
+  getServiceDetailSlugs,
   getServices,
 } from "@/lib/content";
 import type { Project } from "@/lib/content";
@@ -33,6 +34,7 @@ export default function Home() {
       <HomeView
         divisions={divisions}
         services={getServices()}
+        serviceDetailSlugs={getServiceDetailSlugs()}
         projectsBySegment={projectsBySegment}
         marqueeItems={getMarqueeItems()}
       />

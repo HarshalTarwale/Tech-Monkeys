@@ -55,10 +55,15 @@ What we actually do. Answers tentwenty's "our services" job.
 
 - Sticky left panel: eyebrow `02 / …`, h2, rotating `loop-mark` (0→320deg)
 - Right: five rows — mono index, title, summary; accent fill on hover
-- All eight services are listed and sellable. `hasWork` on each records
+- All ten services are listed and sellable. `hasWork` on each records
   whether verified portfolio work backs it (web, e-commerce, platforms, AI
-  do; mobile, brand, SEO, cloud do not yet) — used to avoid linking a
-  prospect to an empty case-study grid. It is not a capability claim.
+  do; mobile, brand, SEO, cloud, consulting, video do not yet) — used to
+  avoid linking a prospect to an empty case-study grid. It is not a
+  capability claim.
+- Consulting and video were added later, to match tentwenty's full service
+  count at the client's explicit request, despite zero portfolio evidence
+  for either — the client's call, made knowingly, with "remove it later"
+  as the stated fallback if the client (theirs, not us) objects.
 - The header "Services" dropdown lists the same eight, sourced from the same
   content file, so the two can never drift.
 

@@ -6,7 +6,13 @@ import { Capabilities } from "@/components/sections/capabilities";
 import { Divisions } from "@/components/sections/divisions";
 import { Hero } from "@/components/sections/hero";
 import { SiteHeader } from "@/components/sections/site-header";
-import type { Division, Project, Segment, Service } from "@/lib/content";
+import type {
+  Division,
+  Project,
+  Segment,
+  Service,
+  ServiceCategory,
+} from "@/lib/content";
 
 /**
  * Holds the one piece of state shared across sections: the active division,
@@ -18,11 +24,13 @@ import type { Division, Project, Segment, Service } from "@/lib/content";
 export function HomeView({
   divisions,
   services,
+  serviceDetailSlugs,
   projectsBySegment,
   marqueeItems,
 }: {
   divisions: Division[];
   services: Service[];
+  serviceDetailSlugs: ServiceCategory[];
   projectsBySegment: Record<string, Project[]>;
   marqueeItems: string[];
 }) {
@@ -30,7 +38,7 @@ export function HomeView({
 
   return (
     <>
-      <SiteHeader services={services} />
+      <SiteHeader services={services} serviceDetailSlugs={serviceDetailSlugs} />
       <Hero
         divisions={divisions}
         mode={mode}
