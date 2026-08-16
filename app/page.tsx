@@ -3,12 +3,15 @@ import { HomeView } from "@/components/sections/home-view";
 import { Work } from "@/components/sections/work";
 import {
   getDivisions,
+  getFeaturedProjects,
   getMarqueeItems,
-  getProjects,
   getProjectsBySegment,
   getServices,
 } from "@/lib/content";
 import type { Project } from "@/lib/content";
+
+/** The homepage ledger is a highlight reel, not the full catalogue. */
+const WORK_SECTION_LIMIT = 5;
 
 /**
  * Home route. Composition only — all content is read through lib/content,
@@ -33,7 +36,7 @@ export default function Home() {
         projectsBySegment={projectsBySegment}
         marqueeItems={getMarqueeItems()}
       />
-      <Work projects={getProjects()} />
+      <Work projects={getFeaturedProjects(WORK_SECTION_LIMIT)} />
       <Contact />
     </>
   );

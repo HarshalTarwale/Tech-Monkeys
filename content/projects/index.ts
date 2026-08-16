@@ -31,12 +31,21 @@ export const divisions: Division[] = [
  * Projects - every entry verified live on 2026-08-15.
  * See docs/project-inventory-verified.md for the audit.
  *
- * `nameApproved: false` on every entry: the client has not yet confirmed
- * which client names may be used publicly. lib/content.ts filters on it, so
- * the site renders an empty grid rather than publishing a name without
- * permission. Flip to true per project once confirmed.
+ * `nameApproved` gates public use of a client's name. lib/content.ts filters
+ * on it, so an unapproved project stays out of the rendered site even
+ * though it sits in this file. Flip to true only once the client has
+ * explicitly confirmed that name for public use.
  *
- * TODO(client): outcome sentence, year and cover image for each.
+ * TODO(client): outcome sentence, year and cover image for each approved
+ * project.
+ *
+ * TODO(client): the Enterprises segment has exactly one real project
+ * (FixNex). The client asked, pending real enterprise-tier work, to
+ * temporarily re-tag three corporate-segment projects (Ark Vision, Sartawi
+ * Properties, Pacific Pearl Hotels — search "borrowed into Enterprises"
+ * below) so the showcase carousel has 4 to cycle through instead of 1.
+ * Revert their `segment` back to "corporates" once real enterprise
+ * projects exist, or if the client decides otherwise.
  */
 export const projects: Project[] = [
   {
@@ -49,7 +58,7 @@ export const projects: Project[] = [
     tags: ["Platform", "Orders", "Invoicing"],
     url: "https://b2-b-blinds.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
     featured: true,
   },
   {
@@ -62,7 +71,7 @@ export const projects: Project[] = [
     tags: ["AI", "Platform", "IoT"],
     url: "https://fixnex.ae",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
     featured: true,
   },
   {
@@ -75,7 +84,7 @@ export const projects: Project[] = [
     tags: ["Platform", "CMS", "Admin"],
     url: "https://taldo-eta.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
     featured: true,
   },
   {
@@ -88,7 +97,7 @@ export const projects: Project[] = [
     tags: ["CRM", "Web"],
     url: "https://saabri-dun.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "cloak",
@@ -112,32 +121,34 @@ export const projects: Project[] = [
     tags: ["Web", "Listings", "Backend"],
     url: "https://continental-properties.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
     featured: true,
   },
+  // borrowed into Enterprises pending real enterprise-tier work — see TODO above
   {
     slug: "sartawi-properties",
     name: "Sartawi Properties",
     sector: "Real Estate",
     scope: "Property discovery site with search, saved listings and agent routing.",
-    segment: "corporates",
+    segment: "enterprises",
     category: "web",
     tags: ["Web", "Brand"],
     url: "https://sartawi-realestate-eosin.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
+  // borrowed into Enterprises pending real enterprise-tier work — see TODO above
   {
     slug: "ark-vision",
     name: "ARK Vision",
     sector: "Real Estate",
     scope: "Luxury property presence for the Dubai market, built around high-value listings.",
-    segment: "corporates",
+    segment: "enterprises",
     category: "web",
     tags: ["Web", "Luxury"],
     url: "https://ark-realestate.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "skyran",
@@ -199,17 +210,18 @@ export const projects: Project[] = [
     status: "live",
     nameApproved: false,
   },
+  // borrowed into Enterprises pending real enterprise-tier work — see TODO above
   {
     slug: "pacific-pearl-hotels",
     name: "Pacific Pearl Hotels",
     sector: "Hospitality",
     scope: "Multi-page hotel presence covering rooms, booking intent and guest experience.",
-    segment: "corporates",
+    segment: "enterprises",
     category: "web",
     tags: ["Web", "Booking"],
     url: "https://pacific-pearl-hotels.vercel.app",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "autobreeze",

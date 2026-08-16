@@ -1,3 +1,33 @@
+
+## Work section: top 5 + View all projects
+
+The homepage ledger now shows a curated top 5 instead of the full project
+catalogue, closing on a link into a dedicated project list.
+
+- `app/page.tsx` calls `getFeaturedProjects(5)` instead of `getProjects()`.
+  `getFeaturedProjects` already existed in `lib/content.ts`: it filters on
+  the `featured` flag and falls back to the first N publishable projects if
+  nothing is flagged, so this never silently shows zero rows just because
+  no one has curated a featured set yet.
+- "View all projects" uses `MagneticButton` — the same magnetic-pull and
+  fill-sweep component as the header's "Get in touch" — centred below the
+  table rather than styled as a table row. It sits outside the table's own
+  `overflow-x-auto` wrapper so it stays centred on the viewport instead of
+  scrolling off with the (wider) table underneath on narrow screens.
+  Verified centred to within a rounding error at 1440/768/390/320px. Links
+  to `/projects`.
+- `/projects` does not exist yet. Per client direction, the link points
+  there now and the page itself is a separate, later task — the button is
+  real (not a dead `#work` anchor), it just 404s until that route is built.
+- The empty state (all projects unapproved, no rows to show at all) still
+  closes on the same CTA, rendered as a standalone `MagneticButton` at the
+  `lg` size instead of a table row, since there is no table to be a row of.
+
+Verified: 5 project rows + the closing row (6 links total) in the populated
+state; the CTA present and correctly styled in the empty state; hover fills
+the closing row edge-to-edge with the same accent treatment as every other
+row; no horizontal overflow on desktop or mobile; build, typecheck and lint
+clean.
 # Design tokens
 
 Extracted from the approved design reference (tech-monkey-logic.base44.app),
@@ -96,6 +126,93 @@ reading the rendered HTML.
 are still `nameApproved: false`; every division renders the placeholder
 until the client clears specific projects for public use. See
 docs/project-inventory-verified.md for the list to review.
+
+## Carousel motion replaced: direction-aware deal -> deck-pull
+
+The `flipped`-aware fix (previous entry, now superseded) still wasn't right
+per client feedback: pressing the arrow that dealt cards in "from the left"
+looked wrong regardless of which page-layout side it corresponded to. The
+client wanted something simpler and more consistent: no matter which arrow
+is pressed, the current card always exits to the right, and the new card
+was already waiting behind it and rises into place — a physical
+top-of-the-deck motion, not a directional slide-in.
+
+Rebuilt `ProjectShowcase` with no direction/flip state at all:
+
+- Dropped the `[index, direction]` tuple state -> plain `index`.
+- Dropped the `flipped` prop and its `sign` multiplier entirely; the
+  `divisions.tsx` call site no longer passes anything but `projects`.
+- Variants no longer take a `dir` argument. `enter` is a fixed small
+  offset (`x: 6%, y: 6%, scale: .9, rotate: 2deg`) as if the card were
+  already stacked behind the visible one; `exit` is a fixed rightward slide
+  (`x: 40%, scale: .85, rotate: 6deg`) regardless of which arrow triggered
+  it.
+- Switched `AnimatePresence` from a `custom={direction}` variant lookup to
+  `mode="popLayout"`, since there's no longer a direction to look up.
+
+Verified by reading the live transform matrix during a "Previous" click
+(the arrow the client specifically flagged): the outgoing and incoming
+card's x-translate both increase monotonically rightward across the whole
+transition (17px -> 62px -> ... -> 247px) — confirming both cards move
+right, never left, regardless of which arrow was pressed. Re-ran the full
+regression: both arrows on all three divisions, mobile, reduced motion, no
+overflow or console errors anywhere.
+
+## Deal-direction fix for left-side showcases
+
+Bug: on Corporates (the one division where `lg:order` flips the showcase to
+the LEFT column, `divisions.tsx`), clicking "next" dealt the incoming card
+in from further right — correct for a right-side showcase, but on the left
+side that direction travels straight across the "Corporates" headline and
+body copy sitting to its right. Startups and Enterprises (both right-side,
+unflipped) had the mirror problem on the opposite arrow ("previous").
+
+Root cause: `ProjectShowcase`'s enter/exit offsets were percentages of the
+card's own width, always signed the same way regardless of which side of
+the page the card actually sat on — the animation had no idea about the
+page-level layout flip happening one level up in `divisions.tsx`.
+
+Fix: `ProjectShowcase` now accepts a `flipped` prop, passed straight through
+from the same `flipped` value `DivisionBlock` already uses for its own
+`lg:order` classes. A `sign` (`flipped ? -1 : 1`) multiplies every x/rotate
+offset in the variants, so "next" always deals from whichever side is
+actually open page space, never toward the text column, regardless of which
+side of the page the showcase's own column lands on.
+
+Verified by reading the live `transform` matrix during a Corporates "next"
+click, not just by eye: the incoming card starts at `x: -454px` (left of
+centre, sliding right to settle at 0) — confirming it deals in from the open
+left margin rather than from the right, where the text sits. Re-ran the full
+regression afterward: both arrows on all three divisions, no overflow at any
+point, mobile and reduced-motion unaffected, no console errors.
+
+## Corporates and Enterprises showcases
+
+Extended the showcase carousel from Startups-only to all three divisions,
+4 projects each, per client request.
+
+**Corporates (4, all real, no re-tagging needed):** Hyde Park Wood, Taldo,
+Saabri, Continental Premium Properties. Picked for variety over similarity —
+a trade portal, a recruitment platform, a CRM and a property platform, not
+four near-identical marketing sites, even though corporates has 13 real
+projects to choose from.
+
+**Enterprises (4, one real, three borrowed):** the verified inventory has
+exactly one enterprise-segment project (FixNex). Flagged this to the client
+directly rather than inventing three more to hit the "minimum 4" ask, which
+would have broken the entire point of the `nameApproved` gating system.
+Client decision: temporarily re-tag three corporate-segment projects (Ark
+Vision, Sartawi Properties, Pacific Pearl Hotels) into Enterprises so the
+carousel has 4 to cycle, to be corrected once real enterprise-tier work
+exists. This is recorded three ways so it cannot get lost: a TODO(client) at
+the top of `content/projects/index.ts`, an inline `// borrowed into
+Enterprises` comment on each of the three entries, and here.
+
+Verified after the data change: all three divisions independently show
+`01/04`, hover-to-activate and the next/prev controls work identically in
+each, and the "one active iframe + one preloaded neighbour" memory guarantee
+holds per-division at 3x scale — 6 iframes total across the full page (2 per
+division x 3), not 6 growing unboundedly, confirmed by count.
 
 ## Project showcase: hover-to-activate + browser-chrome redesign
 
