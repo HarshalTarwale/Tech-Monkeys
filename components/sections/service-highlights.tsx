@@ -40,7 +40,7 @@ export function ServiceHighlights({
               key={highlight.title}
               className="group border-b border-r border-line-strong bg-surface p-7 transition-colors duration-300 hover:bg-bone"
             >
-              <span className="inline-block origin-left font-mono text-[13px] text-accent-deep transition-[color,scale] duration-300 ease-out group-hover:scale-110 group-hover:text-accent">
+              <span className="inline-block origin-left font-mono text-[13px] text-accent-deep transition-[color,scale] duration-300 ease-out group-hover:scale-[1.3] group-hover:text-accent">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-4 text-lg font-medium tracking-[-.01em] text-ink">

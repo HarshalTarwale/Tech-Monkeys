@@ -61,5 +61,36 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
         body: "The site goes live, gets checked against real devices, and stays supported once it's out in the world.",
       },
     ],
+    // What we actually build with — this site itself is the evidence for
+    // the first four; Stripe is verified against real client work (the
+    // NeuroHolistic project in content/projects/index.ts). Nothing here
+    // that isn't demonstrably true.
+    technologies: [
+      {
+        name: "Next.js",
+        category: "Framework",
+        body: "Our default framework for fast, SEO-ready builds — this site runs on it too.",
+      },
+      {
+        name: "React",
+        category: "Interface",
+        body: "Component-driven interfaces that stay maintainable as a site grows past its first version.",
+      },
+      {
+        name: "TypeScript",
+        category: "Language",
+        body: "Typed code catches mistakes before they reach a live site, not after.",
+      },
+      {
+        name: "Tailwind CSS",
+        category: "Styling",
+        body: "A design system styled directly in markup, so design and build never drift apart.",
+      },
+      {
+        name: "Stripe",
+        category: "Payments",
+        body: "Real payment flows when a project needs them — live on client sites today.",
+      },
+    ],
   },
 };

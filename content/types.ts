@@ -88,6 +88,12 @@ export interface ServiceDetail {
   highlights: { title: string; body: string }[];
   /** "How we work" steps, in order. */
   process: { title: string; body: string }[];
+  /**
+   * Real tools this service is actually built with — not a generic
+   * "capabilities" list. Optional: a service without evidenced tooling
+   * simply omits the section rather than listing something unverified.
+   */
+  technologies?: { name: string; category: string; body: string }[];
 }
 
 export interface Testimonial {

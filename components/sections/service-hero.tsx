@@ -27,17 +27,70 @@ export function ServiceHero({ service, intro }: { service: Service; intro: strin
       >
         {service.index}
       </span>
-      {/* .loop-mark sets its own `position: relative` as unlayered CSS in
-          globals.css, which beats any Tailwind `absolute` utility applied to
-          the same element regardless of class order — unlayered rules always
-          win over `@layer` rules in the cascade. Positioning a wrapper
-          around it, rather than positioning the marked element itself,
-          sidesteps the conflict entirely. */}
+      {/* Techy visual for the hero's right-side dead space: an abstract
+          browser-window mockup — skeleton UI blocks, not a real screenshot
+          of anything, so there's no claim being made about a specific
+          site — built from the exact same dark chrome-bar language
+          (traffic lights, mono address pill) as `ShowcaseFrame` in
+          project-showcase.tsx, so it reads as this site's own browser
+          motif rather than a generic stock graphic. Replaces the earlier
+          `loop-mark` ring here, which this would have visually collided
+          with at this size; loop-mark is still used as-is in
+          capabilities.tsx.
+
+          Shown from `xl` (1280px), not `lg` (1024px) like the ghost numeral
+          above — that numeral is faint enough (3.5% opacity) to sit behind
+          the paragraph text without being read as an overlap, but this is
+          solid-coloured UI; at 1024px the paragraph's own max-w-2xl box
+          genuinely runs underneath it (confirmed: the CTA button block sat
+          directly on top of the word "visit" in the body copy). 1280px
+          leaves roughly 160px of clear gap between the text column and the
+          mockup's left edge. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-10 right-14 hidden h-28 w-28 lg:block"
+        className="pointer-events-none absolute right-6 top-1/2 hidden w-95 -translate-y-1/2 xl:right-16 xl:block"
       >
-        <div className="loop-mark h-full w-full" />
+        {/* Secondary card, offset behind, for depth. */}
+        <div className="absolute -right-8 -top-10 w-64 rotate-6 border border-line-strong bg-surface/90 shadow-lg">
+          <div className="flex items-center gap-1.5 border-b border-line-strong px-3 py-2.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-line-strong" />
+            <span className="h-1.5 w-1.5 rounded-full bg-line-strong" />
+            <span className="h-1.5 w-1.5 rounded-full bg-line-strong" />
+          </div>
+          <div className="space-y-2 p-4">
+            <div className="h-1.5 w-3/4 rounded-full bg-line-strong" />
+            <div className="h-1.5 w-1/2 rounded-full bg-line-strong" />
+            <div className="h-1.5 w-2/3 rounded-full bg-line-strong" />
+          </div>
+        </div>
+
+        {/* Main window. */}
+        <div className="relative -rotate-3 overflow-hidden border border-line-strong bg-surface shadow-2xl">
+          <div className="flex items-center gap-3 bg-[#2a2a2e] px-4 py-3">
+            <div className="flex gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+            </div>
+            <div className="flex-1 truncate rounded-md bg-white/10 px-3 py-1.5 text-center font-mono text-[10px] text-white/50">
+              yoursite.com
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="h-2 w-16 rounded-full bg-ink/70" />
+              <div className="flex gap-2">
+                <div className="h-2 w-8 rounded-full bg-line-strong" />
+                <div className="h-2 w-8 rounded-full bg-line-strong" />
+                <div className="h-2 w-8 rounded-full bg-line-strong" />
+              </div>
+            </div>
+            <div className="mb-5 h-28 rounded-md bg-accent/10" />
+            <div className="mb-2.5 h-2 w-full rounded-full bg-line-strong" />
+            <div className="mb-5 h-2 w-2/3 rounded-full bg-line-strong" />
+            <div className="h-7 w-24 rounded-full bg-accent" />
+          </div>
+        </div>
       </div>
 
       <Shell className="relative">

@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Contact } from "@/components/sections/contact";
+import { ServiceCta } from "@/components/sections/service-cta";
 import { ServiceHero } from "@/components/sections/service-hero";
 import { ServiceHighlights } from "@/components/sections/service-highlights";
 import { ServiceProcess } from "@/components/sections/service-process";
+import { ServiceTechnologies } from "@/components/sections/service-technologies";
 import { ServiceWork } from "@/components/sections/service-work";
 import { SiteHeader } from "@/components/sections/site-header";
 import {
@@ -53,6 +55,10 @@ export default async function ServiceDetailPage(
       <ServiceHero service={service} intro={detail.intro} />
       <ServiceHighlights highlights={detail.highlights} />
       <ServiceProcess steps={detail.process} />
+      {detail.technologies && detail.technologies.length > 0 && (
+        <ServiceTechnologies technologies={detail.technologies} />
+      )}
+      <ServiceCta />
       <ServiceWork projects={getProjectsByCategory(service.slug)} />
       <Contact />
     </>
