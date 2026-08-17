@@ -1,189 +1,116 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
+
+import { Reveal } from "@/components/motion/reveal";
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
-import { useScrollCarousel } from "@/components/motion/use-scroll-carousel";
 import { Eyebrow, Shell } from "@/components/ui/shell";
+import { getServiceIcon } from "@/components/ui/service-icons";
 import type { ServiceDetail } from "@/lib/content";
 
-/** Shared stroke style so every step icon reads as one family, not four. */
-function IconFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-9 w-9"
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
-
-const DiscoverIcon = () => (
-  <IconFrame>
-    <circle cx="10" cy="10" r="6" />
-    <path d="M20 20l-5.5-5.5" />
-  </IconFrame>
-);
-const DesignIcon = () => (
-  <IconFrame>
-    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
-  </IconFrame>
-);
-const BuildIcon = () => (
-  <IconFrame>
-    <path d="M8 6 3 12l5 6" />
-    <path d="M16 6l5 6-5 6" />
-  </IconFrame>
-);
-const LaunchIcon = () => (
-  <IconFrame>
-    <path d="M22 2 11 13" />
-    <path d="M22 2 15 22l-4-9-9-4Z" />
-  </IconFrame>
-);
-const DefaultIcon = () => (
-  <IconFrame>
-    <circle cx="12" cy="12" r="8" />
-  </IconFrame>
-);
-
-/** Keyed by step title, lowercased — an unmatched title gets a plain dot
- *  rather than crashing, so a future service without a mapped icon still
- *  renders something. */
-const STEP_ICONS: Record<string, () => React.ReactElement> = {
-  discover: DiscoverIcon,
-  design: DesignIcon,
-  build: BuildIcon,
-  launch: LaunchIcon,
-};
-
 /**
- * Icon presented as a faint accent duplicate offset behind the real one —
- * a cheap, generic way to give any single-stroke glyph a sense of depth
- * (the layered/stacked-shape look reference agency sites use for process
- * icons) without hand-drawing a separate multi-shape illustration per step.
- */
-function StackedIcon({ icon: Icon }: { icon: () => React.ReactElement }) {
-  return (
-    <span className="relative inline-flex h-14 w-14 items-center justify-center text-ink">
-      <span
-        aria-hidden="true"
-        className="absolute translate-x-1.5 translate-y-1.5 text-accent/30"
-      >
-        <Icon />
-      </span>
-      <span className="relative">
-        <Icon />
-      </span>
-    </span>
-  );
-}
-
-/**
- * "How we work" — an editorial, icon-led filmstrip rather than boxed cards
- * on a timeline. Items float directly on the section background (no
- * borders, generous gaps) with an oversized layered icon leading each one,
- * and a plain "01 of 04" counter + a paired prev/next pill below — the
- * scroll mechanics come from `useScrollCarousel`, shared with
- * service-technologies.tsx.
+ * "How we work" — the page's longest section, so it's built to be scanned
+ * rather than read end to end.
  *
- * Rebuilt after the first version (bordered cards on a connecting line) was
- * rejected as "raw." The client's own reference pointed at tentwenty's
- * process section specifically for its restraint — no card chrome, just
- * icon + type + air — adapted to our light palette rather than their dark
- * one (their own explicit instruction: "according to our website theme and
- * vibe").
+ * Layout mirrors the homepage capabilities section (sticky left panel, long
+ * list on the right) so the two read as the same site, but the panel here
+ * carries a scroll-linked progress rail rather than a rotating mark: with
+ * ten stages, the reader's real question is "how much of this is left",
+ * and the rail answers it without a counter that has to be chased.
+ *
+ * Chosen over the horizontal filmstrip this replaced: ten steps in a
+ * side-scroller hides eight of them behind an interaction, which is exactly
+ * wrong for the one section a prospect actually needs to read before
+ * enquiring.
+ *
+ * The rail is `scaleY` on a spring — transform only, so it costs no layout —
+ * and collapses to a static full-height bar under reduced motion rather
+ * than disappearing, since it doubles as a visual spine for the column.
  */
 export function ServiceProcess({ steps }: { steps: ServiceDetail["process"] }) {
-  const { trackRef, index, canScroll, measure, goTo } = useScrollCarousel(steps.length);
+  const ref = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: reduced ? undefined : ref,
+    offset: ["start 0.8", "end 0.9"],
+  });
+  const scaleY = useSpring(scrollYProgress, {
+    stiffness: 220,
+    damping: 34,
+    restDelta: 0.001,
+  });
 
   return (
-    <section className="relative overflow-hidden bg-bone py-24 md:py-32">
-      <Shell className="px-5 md:px-10">
-        <div className="mb-16 grid gap-6 md:grid-cols-2">
-          <Eyebrow>02 / How we work</Eyebrow>
-          <div>
-            <h2 className="text-4xl font-black tracking-[-.04em] text-ink md:text-6xl">
+    <section
+      ref={ref}
+      id="service-process"
+      className="bg-bone px-5 py-24 md:px-10 md:py-32"
+    >
+      <Shell>
+        <div className="grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+          {/* Sticky panel. */}
+          <div className="lg:sticky lg:top-28 lg:h-fit">
+            <Eyebrow>02 / How we work</Eyebrow>
+            <h2 className="mt-7 text-4xl font-black tracking-[-.04em] text-ink md:text-6xl">
               A visible process,
               <br />
               <ScrollFillText>not a black box.</ScrollFillText>
             </h2>
-          </div>
-        </div>
-      </Shell>
+            <p className="mt-7 max-w-sm leading-relaxed text-muted">
+              Ten stages from first conversation to a site that&apos;s live and
+              looked after. You&apos;ll know which one we&apos;re in at any
+              point.
+            </p>
 
-      {/* `relative` here isn't decorative — useScrollCarousel's `goTo` reads
-          each child's `offsetLeft` to scroll to it. Without a position on
-          this element, `offsetLeft` resolves against whatever positioned
-          ancestor is further up the tree instead of this track, so it no
-          longer lines up with `scrollLeft`'s own coordinate space and
-          `goTo` scrolls to the wrong pixel (confirmed: clicking "next"
-          moved scrollLeft by ~24px instead of a full card width). */}
-      <div
-        ref={trackRef}
-        onScroll={measure}
-        style={{ scrollbarWidth: "none" }}
-        className="relative flex snap-x snap-mandatory gap-14 overflow-x-auto scroll-px-5 px-5 pb-2 md:scroll-px-10 md:px-10 md:gap-20 [&::-webkit-scrollbar]:hidden"
-      >
-        {steps.map((step, i) => {
-          const Icon = STEP_ICONS[step.title.toLowerCase()] ?? DefaultIcon;
-          return (
-            <div
-              key={step.title}
-              className="w-56 shrink-0 snap-start sm:w-64"
-            >
-              <StackedIcon icon={Icon} />
-              <span className="mt-8 block font-mono text-[10px] uppercase tracking-[.18em] text-faint">
-                Step {String(i + 1).padStart(2, "0")}
+            <div className="mt-10 hidden items-center gap-4 lg:flex">
+              <div className="relative h-32 w-px bg-line-strong">
+                <motion.div
+                  style={{ scaleY: reduced ? 1 : scaleY }}
+                  className="absolute inset-0 origin-top bg-accent"
+                />
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[.2em] text-faint">
+                {steps.length} stages
               </span>
-              <h3 className="mt-2 text-2xl font-medium tracking-[-.01em] text-ink">
-                {step.title}
-              </h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
-                {step.body}
-              </p>
             </div>
-          );
-        })}
-        <div className="w-5 shrink-0 md:w-10" aria-hidden="true" />
-      </div>
+          </div>
 
-      <Shell className="mt-14 px-5 md:px-10">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-xs tabular-nums text-faint">
-            <span className="text-ink">{String(index + 1).padStart(2, "0")}</span> of{" "}
-            {String(steps.length).padStart(2, "0")}
-          </span>
+          {/* Steps. */}
+          <ol className="relative">
+            {/* Spine behind the icon column. */}
+            <span
+              aria-hidden="true"
+              className="absolute left-6 top-2 hidden h-[calc(100%-1rem)] w-px bg-line-strong sm:block"
+            />
 
-          {canScroll && (
-            <div className="flex items-center gap-1 rounded-full border border-line-strong p-1">
-              <button
-                type="button"
-                onClick={() => goTo(index - 1)}
-                aria-label="Previous step"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink hover:text-white"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => goTo(index + 1)}
-                aria-label="Next step"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink hover:text-white"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </button>
-            </div>
-          )}
+            {steps.map((step, i) => {
+              const Icon = getServiceIcon(step.title);
+              return (
+                <Reveal key={step.title} y={20}>
+                  <li className="group relative flex gap-5 pb-12 sm:gap-7 sm:pb-14">
+                    {/* Icon node, sitting on the spine. */}
+                    <span className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line-strong bg-bone text-ink transition-colors duration-300 group-hover:border-accent group-hover:bg-accent group-hover:text-white">
+                      <Icon className="h-5 w-5" />
+                    </span>
+
+                    <div className="min-w-0 pt-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-[.2em] text-accent-deep">
+                        Stage {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <h3 className="mt-2 text-xl font-medium tracking-[-.02em] text-ink md:text-2xl">
+                        {step.title}
+                      </h3>
+                      <p className="mt-3 max-w-lg leading-relaxed text-muted">
+                        {step.body}
+                      </p>
+                    </div>
+                  </li>
+                </Reveal>
+              );
+            })}
+          </ol>
         </div>
       </Shell>
     </section>

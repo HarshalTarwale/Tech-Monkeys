@@ -5,39 +5,53 @@ import { footerNav, site } from "@/lib/content";
 
 /**
  * Closing CTA and footer. One action: start a conversation.
+ *
+ * `showCta` exists because the service detail pages close on their own
+ * dedicated CTA section immediately above this one. Rendering both would
+ * put two large "get in touch" blocks back to back — and two competing
+ * eyebrows ("Next step" then "04 / Start here", the latter also colliding
+ * with the service page's own 01-05 section numbering). Service pages pass
+ * `showCta={false}` and get the footer only; the homepage keeps the full
+ * block and is unchanged.
  */
-export function Contact() {
+export function Contact({ showCta = true }: { showCta?: boolean }) {
   return (
     <footer
       id="contact"
       className="relative overflow-hidden bg-bone px-5 pb-10 pt-24 md:px-10 md:pt-32"
     >
       <Shell>
-        <div className="border-l-2 border-accent pl-6 md:pl-12">
-          <Eyebrow>04 / Start here</Eyebrow>
-          <h2 className="mt-7 max-w-5xl text-5xl font-black leading-[.95] tracking-[-.055em] text-ink md:text-8xl">
-            Move quickly.
-            <br />
-            {/* Final section: the page stops scrolling while this is still
-                mid-screen, so the sweep is anchored to the real remaining
-                scroll distance instead of a fixed viewport offset. */}
-            <ScrollFillText anchor="end">
-              Build something that lasts.
-            </ScrollFillText>
-          </h2>
-          {/* Same magnetic-pull + fill-sweep treatment as the header's
-              "Get in touch", at the "lg" size variant for this section's
-              larger scale. */}
-          <MagneticButton
-            href={`mailto:${site.email}`}
-            size="lg"
-            className="mt-10"
-          >
-            Start a conversation
-          </MagneticButton>
-        </div>
+        {showCta && (
+          <div className="border-l-2 border-accent pl-6 md:pl-12">
+            <Eyebrow>04 / Start here</Eyebrow>
+            <h2 className="mt-7 max-w-5xl text-5xl font-black leading-[.95] tracking-[-.055em] text-ink md:text-8xl">
+              Move quickly.
+              <br />
+              {/* Final section: the page stops scrolling while this is still
+                  mid-screen, so the sweep is anchored to the real remaining
+                  scroll distance instead of a fixed viewport offset. */}
+              <ScrollFillText anchor="end">
+                Build something that lasts.
+              </ScrollFillText>
+            </h2>
+            {/* Same magnetic-pull + fill-sweep treatment as the header's
+                "Get in touch", at the "lg" size variant for this section's
+                larger scale. */}
+            <MagneticButton
+              href={`mailto:${site.email}`}
+              size="lg"
+              className="mt-10"
+            >
+              Start a conversation
+            </MagneticButton>
+          </div>
+        )}
 
-        <div className="mt-28 grid gap-8 border-t border-line-strong pt-7 text-sm text-muted md:grid-cols-3">
+        <div
+          className={`grid gap-8 border-t border-line-strong pt-7 text-sm text-muted md:grid-cols-3 ${
+            showCta ? "mt-28" : ""
+          }`}
+        >
           <div>
             <span className="font-medium text-ink">{site.wordmark}.</span>
             <br />

@@ -1,21 +1,21 @@
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
-import { ProjectShowcase } from "@/components/ui/project-showcase";
+import { ProjectPanels } from "@/components/ui/project-panels";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
 import type { Project } from "@/lib/content";
 
 /**
  * Proof for this specific service — real, approved projects in its
- * category, shown in the same interactive live-site carousel already built
- * for the homepage divisions (`ProjectShowcase`: real embedded iframes in
- * browser chrome, hover-to-activate, direction-aware deal transition).
+ * category, as a two-up panel pair with a centred prev/next pill. Matches
+ * the structure the client pointed at directly (a competitor's case-studies
+ * section: two large image cards, name captioned below, arrows between
+ * them) — see project-panels.tsx for what stands in for the photography we
+ * don't have.
  *
- * Replaces an earlier plain ledger-table version. The client asked for
- * image-rich case studies, matching a reference agency site's visual card
- * carousel; reusing `ProjectShowcase` gets a genuinely richer, more
- * "premium" presentation for free, and reuses already-verified
- * infrastructure rather than adding new imagery — the previews are the
- * actual live sites, not screenshots, so there's nothing to fabricate or
- * keep in sync.
+ * Third version of this section. Reused `ProjectShowcase` (the homepage's
+ * live-iframe carousel) verbatim first, which read as a smaller repeat of a
+ * section already on the homepage; a plain large-type name list came next,
+ * which read as too quiet. This is the one built directly off client
+ * reference rather than another internal guess.
  *
  * `projects` is already gated through `getProjectsByCategory` in
  * lib/content.ts — nothing unapproved can reach this component.
@@ -40,9 +40,7 @@ export function ServiceWork({ projects }: { projects: Project[] }) {
 
         {projects.length > 0 ? (
           <>
-            <div className="mx-auto max-w-3xl">
-              <ProjectShowcase projects={projects} />
-            </div>
+            <ProjectPanels projects={projects} />
 
             <div className="mt-14 text-center">
               <a

@@ -43,11 +43,19 @@ export function ScrollFillText({
   children,
   className = "",
   anchor = "default",
+  tone = "dark",
 }: {
   children: React.ReactNode;
   className?: string;
   /** "end" for headings in the final section, which cannot scroll to the top. */
   anchor?: "default" | "end";
+  /**
+   * Which way round the sweep runs. "dark" fills muted grey with ink, for
+   * the light sections that make up most of the site. "light" fills a
+   * dimmed white with solid white, for headings sitting on an ink
+   * background — the ink-on-light gradient is invisible there.
+   */
+  tone?: "dark" | "light";
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
@@ -103,16 +111,30 @@ export function ScrollFillText({
 
   const backgroundPosition = useTransform(eased, [0, 1], ["100% 0%", "0% 0%"]);
 
+  // Colour pair for the sweep. The "light" tone can't reuse --tm-faint as
+  // its unfilled half — that grey reads as muddy against ink — so it dims
+  // white directly instead.
+  const [filled, unfilled] =
+    tone === "light"
+      ? ["#ffffff", "rgba(255,255,255,.34)"]
+      : ["var(--tm-ink)", "var(--tm-faint)"];
+
   if (reduced) {
-    return <span className={`text-faint ${className}`}>{children}</span>;
+    return (
+      <span
+        className={className}
+        style={{ color: tone === "light" ? "rgba(255,255,255,.55)" : "var(--tm-faint)" }}
+      >
+        {children}
+      </span>
+    );
   }
 
   return (
     <motion.span
       ref={ref}
       style={{
-        backgroundImage:
-          "linear-gradient(to right, var(--tm-ink) 0%, var(--tm-ink) 47%, var(--tm-faint) 53%, var(--tm-faint) 100%)",
+        backgroundImage: `linear-gradient(to right, ${filled} 0%, ${filled} 47%, ${unfilled} 53%, ${unfilled} 100%)`,
         backgroundSize: "210% 100%",
         backgroundPosition,
         // Descenders can clip against the text box on some engines.

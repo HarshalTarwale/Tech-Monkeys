@@ -24,11 +24,24 @@ const SIZES = {
   lg: "h-12 gap-2 px-6 text-sm sm:h-14 sm:gap-2.5 sm:px-7 sm:text-base",
 } as const;
 
+/**
+ * Ground the button sits on. `dark` is the ink pill used on the site's
+ * light sections; `light` is its inverse, for the ink-background sections
+ * on the service pages where an ink pill is very nearly invisible
+ * (#141416 on #141416). The accent sweep is identical in both — only the
+ * resting fill and label colour flip.
+ */
+const TONES = {
+  dark: "bg-ink text-white",
+  light: "bg-white text-ink group-hover:text-white",
+} as const;
+
 export function MagneticButton({
   href,
   children,
   className = "",
   size = "md",
+  tone = "dark",
 }: {
   href: string;
   children: ReactNode;
@@ -43,6 +56,8 @@ export function MagneticButton({
    * conflict entirely since only one size's classes are ever present.
    */
   size?: keyof typeof SIZES;
+  /** Use "light" on ink/dark backgrounds. */
+  tone?: keyof typeof TONES;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -68,7 +83,7 @@ export function MagneticButton({
       onMouseMove={handleMove}
       onMouseLeave={() => setOffset({ x: 0, y: 0 })}
       style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-      className={`group relative inline-flex items-center overflow-hidden rounded-full bg-ink font-medium text-white transition-transform duration-300 ease-out ${SIZES[size]} ${className}`}
+      className={`group relative inline-flex items-center overflow-hidden rounded-full font-medium transition-[transform,color] duration-300 ease-out ${TONES[tone]} ${SIZES[size]} ${className}`}
     >
       {/* Accent disc that sweeps up to fill the pill. */}
       <span

@@ -84,6 +84,24 @@ export interface ServiceDetail {
   slug: ServiceCategory;
   /** Paragraph under the page's headline, expanding on the Service summary. */
   intro: string;
+  /** Short line set under the hero — the service's promise in one breath. */
+  tagline: string;
+  /** Short capability words for the hero marquee band. */
+  marquee: string[];
+  /**
+   * The page's first tonal break (ServiceStatement) — shaped like every
+   * other section heading on the page (plain line + short scroll-filled
+   * line) rather than one long paragraph, so it doesn't stand out as the
+   * one section that breaks the established heading pattern.
+   */
+  statement: {
+    /** Plain first line. */
+    lead: string;
+    /** Short second line, scroll-filled — keep this brief, it's a punch not a paragraph. */
+    emphasis: string;
+    /** Supporting paragraph underneath, in a dimmed tone. */
+    support: string;
+  };
   /** "What's included" grid: 5-6 concrete facets of the service. */
   highlights: { title: string; body: string }[];
   /** "How we work" steps, in order. */
@@ -94,6 +112,8 @@ export interface ServiceDetail {
    * simply omits the section rather than listing something unverified.
    */
   technologies?: { name: string; category: string; body: string }[];
+  /** Questions a first-time buyer actually asks before enquiring. */
+  faqs?: { question: string; answer: string }[];
 }
 
 export interface Testimonial {

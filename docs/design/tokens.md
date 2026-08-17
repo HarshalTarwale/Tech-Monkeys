@@ -478,3 +478,75 @@ hydration resolved; the CSS override wins immediately. Renders solid
 - Confirm light-first vs the dark-first brief
 - Real project data (reference ships placeholder client names)
 - Logo asset, and real contact details
+
+## Service detail pages (`/services/[slug]`)
+
+First one built: `web` (Website Design & Development). Structure follows the
+competitor page the client asked us to match (tentwenty's web design service
+page) — comparable section order and depth — with every sentence written
+from scratch. Nothing lifted.
+
+Section rhythm alternates ground on purpose: bone hero -> **ink statement**
+-> white highlights -> bone process -> **ink technologies** -> bone work ->
+white FAQ -> **ink CTA**. The site stays light-first per the tokens above;
+dark is punctuation, not a second identity. Client sign-off on this: "you can
+use black bg in between or in any section if it looks good."
+
+Sections, and why each is shaped the way it is:
+
+- **Hero.** Two-column above `lg`, with `BrowserMockup` (three drifting
+  skeleton windows + a phone) filling what was dead space. Abstract UI, not
+  a screenshot, so it claims nothing about a specific project — but built
+  from the same dark chrome-bar language as `ShowcaseFrame`, so it reads as
+  this site's own motif. Mockup drops out below `lg`: an earlier version
+  showed it from `lg` and it sat directly on top of the body copy at 1024px.
+  Closes on a `Marquee` band of capability words.
+- **Statement (ink).** One pointed line about why most sites fail, using
+  `ScrollFillText tone="light"` — the default ink-on-light gradient is
+  invisible on ink, so the component gained a `tone` prop rather than a
+  second copy of it.
+- **01 What's included.** Six-cell hairline grid, each led by a line icon
+  from `components/ui/service-icons.tsx`. Index numeral scales 1.3x and
+  goes accent on hover (raised from 1.1x at client request).
+- **02 How we work.** Ten stages: sticky left panel with a scroll-linked
+  progress rail, long list on the right on a vertical spine. Replaced a
+  horizontal filmstrip — ten steps in a side-scroller hides eight of them
+  behind an interaction, which is exactly wrong for the one section a
+  prospect needs to read before enquiring.
+- **03 Technologies (ink).** Eight tools as a four-across hairline grid.
+  Wordmark type, never the vendors' real logo art: reproducing a third
+  party's trademark isn't ours to do the way a client's logo is in a case
+  study. Grid, not carousel, for the same "breadth at a glance" reason.
+- **04 Selected work.** Reuses `ProjectShowcase` — real live-site iframes in
+  browser chrome, gated through `getProjectsByCategory`, so the publication
+  gate still applies and the "images" are genuinely real sites.
+- **05 FAQ.** Takes the slot where the reference runs five client
+  testimonials. We have zero approved quotes and inventing them would
+  breach AGENTS.md, so this does the same reassurance job honestly. Answers
+  stay in the DOM when collapsed (SEO) and open via a `0fr -> 1fr`
+  grid-template-rows transition, so nothing is measured or clipped.
+- **CTA (ink).** `MagneticButton` gained a `tone="light"` variant here: the
+  default ink pill on an ink background measured #141416 on #141416 —
+  effectively invisible. `Contact` gained `showCta={false}` so the footer
+  doesn't stack a second CTA (and a second "04 / Start here" eyebrow,
+  colliding with this page's own 01-05 numbering) right underneath.
+
+`Reveal` (`components/motion/reveal.tsx`) is the shared scroll-in wrapper.
+It branches the whole render under reduced motion rather than blanking
+`initial`/`whileInView` on a `motion.div` — the conditional-prop version
+leaves content permanently at `opacity: 0`, because `useReducedMotion()`
+returns `null` for one render and by the time it flips true the
+`whileInView` that would have revealed it is gone. Same fix `hero.tsx` and
+`scroll-fill-text.tsx` already carry. Verified: zero elements below 0.1
+opacity under `reducedMotion: "reduce"`.
+
+TODO(client): the ten process stages describe a conventional studio
+delivery sequence, written deliberately non-specific (no named PM tool, no
+promised SLA, no headcount). This is the one block on the page making a
+claim only the client can verify — confirm it matches how the team really
+runs a project.
+
+Verified: no horizontal overflow at 320 / 390 / 1024 / 1440 / 2560px, FAQ
+toggles correctly with single-open behaviour, CTA button contrast
+white-on-ink, homepage footer CTA unchanged, no console errors, clean
+typecheck / lint / build.
