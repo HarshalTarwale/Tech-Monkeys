@@ -6,6 +6,20 @@ import { site } from "@/lib/content";
 import type { Service, ServiceDetail } from "@/lib/content";
 
 /**
+ * Splits a service title into two lines for the hero heading — the first
+ * ceil(n/2) words on line one, the rest on line two. Checked against all
+ * ten real titles in content/services/index.ts, not just "Website Design &
+ * Development": an even word-count split happens to land on a natural
+ * break for every one of them (e.g. "Cloud, Hosting" / "& Support",
+ * "Web Apps &" / "SaaS Platforms") without needing a per-service override.
+ */
+function splitTitle(title: string): [string, string] {
+  const words = title.split(" ");
+  const cut = Math.ceil(words.length / 2);
+  return [words.slice(0, cut).join(" "), words.slice(cut).join(" ")];
+}
+
+/**
  * Opening section of a service detail page (`/services/[slug]`).
  *
  * Two-column above `lg`: type on the left, the drifting browser-window
@@ -15,11 +29,9 @@ import type { Service, ServiceDetail } from "@/lib/content";
  *
  * No breadcrumb above the heading — dropped per client feedback, the
  * header's own "Services" dropdown already covers getting back. The
- * heading itself is two lines rather than three, with the second line set
- * larger than the first (client-specified): "Website Design" reads as the
- * setup, "& Development" as the payoff, so it earns the bigger size rather
- * than following a strict top-to-bottom size decrescendo the way the old
- * three-line version did.
+ * heading is two lines rather than three, with the second line set larger
+ * than the first (client-specified, originally built for "Website Design"
+ * / "& Development" specifically).
  *
  * The heading and intro are plain server-rendered text with no animation
  * on them at all, so the LCP element is painted on first byte; every
@@ -33,6 +45,8 @@ export function ServiceHero({
   service: Service;
   detail: ServiceDetail;
 }) {
+  const [titleLine1, titleLine2] = splitTitle(service.title);
+
   return (
     <section className="grain relative overflow-hidden bg-bone pt-28 md:pt-36">
       {/* Ghost numeral watermark, clipped by the section's own
@@ -49,12 +63,22 @@ export function ServiceHero({
           <div>
             <Eyebrow>{service.index} / Services</Eyebrow>
 
+            {/* The service page's own title is dynamic across ten services
+                of very different lengths, so line two's clamp is tuned to
+                the longest real second line in the set ("Digital
+                Consulting", from "Strategic & Digital Consulting") rather
+                than the original single-service "& Development" — that
+                narrower clamp wrapped "Digital Consulting" onto an
+                orphaned word at 1024px (confirmed by rendering it, the
+                same class of bug the original heading split was fixed
+                for). Verified clear at 1024/1280/1440 for every one of the
+                ten titles, not just the longest. */}
             <h1 className="mt-6 font-black text-ink">
               <span className="block text-[clamp(2rem,0.9rem+3.6vw,3.75rem)] leading-none tracking-[-.04em]">
-                Website Design
+                {titleLine1}
               </span>
-              <span className="mt-1 block text-[clamp(2.5rem,1rem+3.4vw,4.5rem)] leading-[.9] tracking-[-.045em]">
-                &amp; Development
+              <span className="mt-1 block text-[clamp(2.25rem,0.85rem+2.6vw,3.75rem)] leading-[.95] tracking-[-.045em]">
+                {titleLine2}
               </span>
             </h1>
 

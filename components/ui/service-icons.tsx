@@ -156,6 +156,58 @@ const Dot = (p: IconProps) => (
   </Frame>
 );
 
+const Stack = (p: IconProps) => (
+  <Frame {...p}>
+    <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+    <path d="m3 13 9 5 9-5" />
+  </Frame>
+);
+
+const Server = (p: IconProps) => (
+  <Frame {...p}>
+    <rect x="3" y="4" width="18" height="6" rx="1.5" />
+    <rect x="3" y="14" width="18" height="6" rx="1.5" />
+    <path d="M7 7h.01M7 17h.01" />
+  </Frame>
+);
+
+const Compass = (p: IconProps) => (
+  <Frame {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15 9-2 6-6 2 2-6 6-2Z" />
+  </Frame>
+);
+
+const Gauge = (p: IconProps) => (
+  <Frame {...p}>
+    <path d="M4 15a8 8 0 1 1 16 0" />
+    <path d="M12 15 15.5 9.5" />
+    <path d="M4 19h16" />
+  </Frame>
+);
+
+const Gear = (p: IconProps) => (
+  <Frame {...p}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 3v2.5M12 18.5V21M21 12h-2.5M5.5 12H3M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4 5.6 5.6" />
+  </Frame>
+);
+
+const Camera = (p: IconProps) => (
+  <Frame {...p}>
+    <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
+    <circle cx="12" cy="13.5" r="3.5" />
+  </Frame>
+);
+
+const Clapperboard = (p: IconProps) => (
+  <Frame {...p}>
+    <path d="M4 9.5 5.5 4h13l1.5 5.5" />
+    <path d="M4 9.5h16V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5Z" />
+    <path d="m8 4 1.5 5.5M13 4l1.5 5.5" />
+  </Frame>
+);
+
 /**
  * Title (lowercased) -> glyph. Keys match the `title` values in
  * content/services/details.ts.
@@ -169,7 +221,9 @@ const ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
   "seo-ready structure": Graph,
   "handover you can actually use": Key,
 
-  // "How we work"
+  // "How we work" — shared across every service page, reused wherever the
+  // underlying step genuinely is the same one, so the icon set doesn't grow
+  // one-for-one with the number of services.
   "kick-off": Flag,
   "the project team": Team,
   "planning & timelines": Calendar,
@@ -187,6 +241,48 @@ const ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
   design: Pen,
   build: Code,
   launch: Send,
+
+  // Mobile / e-commerce / platforms
+  "choosing the framework": Stack,
+  "choosing the platform": Stack,
+  "defining the architecture": Stack,
+  "launch & store submission": Send,
+
+  // AI
+  "ai audit & roadmap": Compass,
+  "ai implementation": Code,
+  "ai retainer & optimisation": Gauge,
+
+  // SEO
+  "audit & strategy": Search,
+  implementation: Code,
+  "seo reporting": Graph,
+
+  // Cloud / hosting
+  "server requirements": Server,
+  "environment testing": Shield,
+  "website deployment": Send,
+  "hosting reporting": Graph,
+
+  // Consulting
+  "understanding business needs": Search,
+  "aligning stakeholders": Team,
+  "digitising processes": Gear,
+  "finding digital opportunities": Compass,
+  "defining the roadmap": Flag,
+
+  // Video & film
+  "kick-off & narrative": Flag,
+  "planning & scheduling": Calendar,
+  "creative approach": Clapperboard,
+  filming: Camera,
+  "editing & quality control": Shield,
+
+  // Branding
+  "brand strategy": Compass,
+  "visual identity": Pen,
+  "design system": Layout,
+  "application & handover": Key,
 };
 
 export function getServiceIcon(title: string) {
