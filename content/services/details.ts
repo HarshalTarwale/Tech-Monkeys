@@ -54,14 +54,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "Designed to be remembered. Built to be found.",
     intro:
       "Your website is usually the first real interaction someone has with your business — before a call, before a meeting, before a quote. We design and build sites that hold up to that moment: quick to load, obvious to navigate, and built so a visit turns into an enquiry instead of a bounce.",
-    marquee: [
-      "Web Design",
-      "Development",
-      "UI/UX",
-      "SEO Ready",
-      "CMS",
-      "Performance",
-    ],
     statement: {
       lead: "Most sites lose people",
       emphasis: "in the first five seconds.",
@@ -222,14 +214,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "One build. Every phone in your customer's pocket.",
     intro:
       "A mobile app puts you where people already spend their time — not a tab they have to remember to open, an icon on their home screen. We design and build apps that feel native on both iOS and Android from a single codebase, so you're not paying to build the same product twice.",
-    marquee: [
-      "iOS",
-      "Android",
-      "Cross-Platform",
-      "Push Notifications",
-      "Offline-Ready",
-      "App Store",
-    ],
     statement: {
       lead: "A website gets visited.",
       emphasis: "An app gets opened.",
@@ -339,14 +323,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "A storefront that closes the sale, not just displays it.",
     intro:
       "An online store has one job past looking good: turning a browse into a checkout. We build storefronts with real payments, configurable products and the operational backend behind them — the parts a template can't give you.",
-    marquee: [
-      "Storefronts",
-      "Stripe Payments",
-      "Product Configurators",
-      "Checkout",
-      "Inventory",
-      "Subscriptions",
-    ],
     statement: {
       lead: "Most carts get abandoned",
       emphasis: "before checkout even starts.",
@@ -481,14 +457,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "The system your spreadsheets stopped being able to run.",
     intro:
       "Order management, CRM, admin tools — the software that carries a business's daily operations, built around how you actually work rather than bent to fit an off-the-shelf tool. If a process still lives in a spreadsheet passed around by email, this is what replaces it.",
-    marquee: [
-      "Web Apps",
-      "SaaS",
-      "CRM",
-      "Admin Tools",
-      "Automation",
-      "Dashboards",
-    ],
     statement: {
       lead: "A spreadsheet is a system",
       emphasis: "until three people are editing it.",
@@ -627,14 +595,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "AI that removes real work, not a chatbot for its own sake.",
     intro:
       "Most businesses are experimenting with AI tools without a clear plan for where they actually help. We start with the audit, not the technology — finding the specific, repeatable work worth automating, then building the system that does it.",
-    marquee: [
-      "AI Audit",
-      "Automation",
-      "Predictive Systems",
-      "Connected Sensors",
-      "Assistants",
-      "Workflow Automation",
-    ],
     statement: {
       lead: "AI curiosity is everywhere.",
       emphasis: "Working AI systems are rare.",
@@ -753,14 +713,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "An identity people recognise before they read a word.",
     intro:
       "Interface systems and brand identities designed to make a product legible, usable and worth trusting — the visual language everything else on this list gets built inside of.",
-    marquee: [
-      "Identity",
-      "Design Systems",
-      "UI Kits",
-      "Brand Strategy",
-      "Typography",
-      "Visual Language",
-    ],
     statement: {
       lead: "A logo isn't a brand.",
       emphasis: "A system that holds together is.",
@@ -862,14 +814,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "Found by the people already searching for you.",
     intro:
       "Technical SEO, content structure and campaigns that compound organic demand over time. Ranking isn't a checkbox at the end of a project — it's a foundation decision made from the first line of markup.",
-    marquee: [
-      "Technical SEO",
-      "Content Structure",
-      "Core Web Vitals",
-      "Search Visibility",
-      "Site Structure",
-      "Organic Growth",
-    ],
     statement: {
       lead: "People are already searching",
       emphasis: "for what you do.",
@@ -963,14 +907,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "Live, fast, and someone's actually watching it.",
     intro:
       "Deployment, monitoring and maintenance that keep what we build fast and online. A site that's slow to deploy or silent when it breaks costs trust the moment it happens — this is the part that stops that.",
-    marquee: [
-      "Deployment",
-      "Monitoring",
-      "SSL & Domains",
-      "Uptime",
-      "Edge Hosting",
-      "Support",
-    ],
     statement: {
       lead: "A site that's slow to fix",
       emphasis: "is a site that's already losing.",
@@ -1075,14 +1011,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "Direction before commitment, from people who'll build it.",
     intro:
       "Roadmapping and technical direction for teams deciding what to build before they build it. Not generic strategy slides — a scoped plan from the people who'd actually be doing the work if you go ahead.",
-    marquee: [
-      "Strategy",
-      "Roadmapping",
-      "Technical Direction",
-      "Audits",
-      "Scoping",
-      "Process Digitisation",
-    ],
     statement: {
       lead: "The most expensive mistake",
       emphasis: "is building the wrong thing well.",
@@ -1176,14 +1104,6 @@ export const serviceDetails: Partial<Record<ServiceCategory, ServiceDetail>> = {
     tagline: "A story people actually feel, not just watch.",
     intro:
       "Product, brand and campaign film built to sit inside the same launch as a site — planned, shot and edited with the same attention to the audience that the rest of the work gets.",
-    marquee: [
-      "Brand Film",
-      "Product Video",
-      "Campaign Content",
-      "Editing",
-      "Storytelling",
-      "Post-Production",
-    ],
     statement: {
       lead: "Nobody remembers a feature list.",
       emphasis: "They remember how something felt.",

@@ -95,8 +95,6 @@ export interface ServiceDetail {
   intro: string;
   /** Short line set under the hero — the service's promise in one breath. */
   tagline: string;
-  /** Short capability words for the hero marquee band. */
-  marquee: string[];
   /**
    * The page's first tonal break (ServiceStatement) — shaped like every
    * other section heading on the page (plain line + short scroll-filled

@@ -1,5 +1,4 @@
 import { MagneticButton } from "@/components/ui/magnetic-button";
-import { Marquee } from "@/components/ui/marquee";
 import { ServiceMockup } from "@/components/ui/service-mockup";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
 import { site } from "@/lib/content";
@@ -36,9 +35,9 @@ function splitTitle(title: string): [string, string] {
  * / "& Development" specifically).
  *
  * The heading and intro are plain server-rendered text with no animation
- * on them at all, so the LCP element is painted on first byte; every
- * moving part (the mockup's float, the marquee) is decorative and sits
- * outside that path, per the motion constraints in AGENTS.md.
+ * on them at all, so the LCP element is painted on first byte; the one
+ * moving part (the mockup's float) is decorative and sits outside that
+ * path, per the motion constraints in AGENTS.md.
  */
 export function ServiceHero({
   service,
@@ -50,7 +49,7 @@ export function ServiceHero({
   const [titleLine1, titleLine2] = splitTitle(service.title);
 
   return (
-    <section className="grain relative overflow-hidden bg-bone pt-28 md:pt-36">
+    <section className="grain relative overflow-hidden bg-bone pb-16 pt-28 md:pb-20 md:pt-36">
       {/* Ghost numeral watermark, clipped by the section's own
           overflow-hidden so it can never widen the page. */}
       <span
@@ -114,8 +113,6 @@ export function ServiceHero({
           </div>
         </div>
       </Shell>
-
-      <Marquee items={detail.marquee} />
     </section>
   );
 }
