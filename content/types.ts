@@ -50,6 +50,15 @@ export interface Project {
   year?: number;
   /** Cover image in /public. Omit until supplied. */
   image?: string;
+  /**
+   * Silent screen-recording of the project, in /public (e.g. "/video/cloak.mp4").
+   * Plays muted+looped on hover in the /projects grid.
+   *
+   * Omit until a real recording exists. The grid falls back to a live
+   * embed of the project's own `url`, so a missing video degrades to real
+   * content rather than a placeholder — see components/ui/project-tile.tsx.
+   */
+  video?: string;
   status: ProjectStatus;
   /** Client has approved public use of their name. Gates publication. */
   nameApproved: boolean;

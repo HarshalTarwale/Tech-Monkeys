@@ -19,17 +19,23 @@ export const site = {
 
 /**
  * Primary navigation. "Services" opens a dropdown listing all ten
- * services; the rest are section anchors.
+ * services; the rest are section anchors, except "Projects" which is now a
+ * real route.
  *
- * Hrefs are home-relative (`/#section`), not bare hashes — the site now has
- * subpages (`/services/[slug]`), and a bare `#section` href only resolves
- * against whatever route it's rendered on. `/#section` works identically on
- * `/` itself (same-document anchor scroll, no reload) and correctly
- * navigates back to the homepage section from anywhere else.
+ * Section hrefs are home-relative (`/#section`), not bare hashes — the site
+ * has subpages (`/services/[slug]`, `/projects`), and a bare `#section`
+ * href only resolves against whatever route it's rendered on. `/#section`
+ * works identically on `/` itself (same-document anchor scroll, no reload)
+ * and correctly navigates back to the homepage section from anywhere else.
+ *
+ * "Projects" points at `/projects` rather than the homepage's `#work`
+ * ledger: that section is a curated top-five highlight reel, whereas the
+ * route is the full index. A nav item labelled "Projects" landing on a
+ * five-row excerpt was the wrong destination once the real page existed.
  */
 export const nav = [
   { label: "Services", href: "/#capabilities", hasDropdown: true },
-  { label: "Projects", href: "/#work" },
+  { label: "Projects", href: "/projects" },
   { label: "About", href: "/#divisions" },
   { label: "Contact", href: "/#contact" },
 ] as const;
@@ -37,7 +43,7 @@ export const nav = [
 /** Footer link list. Plain anchors, no dropdown. */
 export const footerNav = [
   { label: "Services", href: "/#capabilities" },
-  { label: "Projects", href: "/#work" },
+  { label: "Projects", href: "/projects" },
   { label: "About", href: "/#divisions" },
   { label: "Contact", href: "/#contact" },
 ] as const;
