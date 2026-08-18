@@ -1,6 +1,6 @@
-import { BrowserMockup } from "@/components/ui/browser-mockup";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { Marquee } from "@/components/ui/marquee";
+import { ServiceMockup } from "@/components/ui/service-mockup";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
 import { site } from "@/lib/content";
 import type { Service, ServiceDetail } from "@/lib/content";
@@ -22,10 +22,12 @@ function splitTitle(title: string): [string, string] {
 /**
  * Opening section of a service detail page (`/services/[slug]`).
  *
- * Two-column above `lg`: type on the left, the drifting browser-window
- * stack on the right filling what was previously dead space. Below `lg`
- * the mockup drops out entirely rather than stacking — at that width it
- * would push the CTAs below the fold for no informational gain.
+ * Two-column above `lg`: type on the left, a `ServiceMockup` on the right
+ * filling what was previously dead space — a distinct illustration per
+ * service (see service-mockup.tsx) rather than one generic graphic reused
+ * across all ten pages. Below `lg` the mockup drops out entirely rather
+ * than stacking — at that width it would push the CTAs below the fold for
+ * no informational gain.
  *
  * No breadcrumb above the heading — dropped per client feedback, the
  * header's own "Services" dropdown already covers getting back. The
@@ -108,7 +110,7 @@ export function ServiceHero({
           </div>
 
           <div className="hidden lg:block">
-            <BrowserMockup />
+            <ServiceMockup slug={service.slug} />
           </div>
         </div>
       </Shell>

@@ -7,8 +7,9 @@ const noopSubscribe = () => () => {};
 /**
  * True once past hydration, false during SSR and the client's first paint.
  *
- * Extracted here once a second component (`project-index.tsx`, alongside
- * `browser-mockup.tsx`) needed the same guard: anything that conditionally
+ * Shared across every client component that conditionally mounts a subtree
+ * based on a browser-only check — currently `service-mockup.tsx` (the
+ * hero's per-service illustration). Anything that conditionally
  * mounts a subtree based on a browser-only check (`window.matchMedia`,
  * `useReducedMotion()`, `hover`/`pointer` capability) will hydration-mismatch
  * for real users if that check can resolve differently between the server's
