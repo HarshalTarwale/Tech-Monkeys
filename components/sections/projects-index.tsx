@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
-import { useMounted } from "@/components/motion/use-mounted";
 import { CATEGORY_LABEL, ProjectTile } from "@/components/ui/project-tile";
 import { Shell } from "@/components/ui/shell";
+import { useViewCursor } from "@/components/ui/view-cursor";
 import type { Project, ServiceCategory } from "@/lib/content";
 
 type Filter = ServiceCategory | "all";
@@ -25,35 +25,18 @@ type Filter = ServiceCategory | "all";
  * full `ServiceCategory` union, so a category with nothing published can't
  * render a tab that leads to an empty grid.
  *
- * The cursor bubble is gated three ways, and all three matter:
- *   - `useMounted()` — its markup depends on a `window.matchMedia` check
- *     the server can't run, so mounting it before hydration completes
- *     produces a real mismatch (same class of bug, same fix, as
- *     service-mockup.tsx).
- *   - `hover: hover and pointer: fine` — touch has no cursor to replace,
- *     and hiding the cursor there would just remove the affordance.
- *   - `useReducedMotion()` — a spring-tracked element chasing the pointer
- *     is exactly the kind of motion that setting asks us to drop.
- * When any of those is false, `cursor-none` is never applied either, so
- * the real cursor is never hidden without a replacement.
+ * The "View site" cursor bubble comes from `useViewCursor`, shared with the
+ * homepage work section — see that hook for why it's gated the way it is.
  */
 export function ProjectsIndex({ projects }: { projects: Project[] }) {
   const reduced = useReducedMotion();
-  const mounted = useMounted();
-  const [canHover] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-  );
   const [filter, setFilter] = useState<Filter>("all");
-  const [hovering, setHovering] = useState(false);
-
-  const cursorEnabled = mounted && canHover && !reduced;
-
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const x = useSpring(rawX, { stiffness: 400, damping: 34, mass: 0.5 });
-  const y = useSpring(rawY, { stiffness: 400, damping: 34, mass: 0.5 });
+  const {
+    enabled: cursorEnabled,
+    handleMove,
+    setHovering,
+    cursor,
+  } = useViewCursor();
 
   // Only categories that actually have published work get a tab.
   const filters = useMemo(() => {
@@ -73,12 +56,6 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
       filter === "all" ? projects : projects.filter((p) => p.category === filter),
     [projects, filter],
   );
-
-  function handleMove(event: React.MouseEvent) {
-    if (!cursorEnabled) return;
-    rawX.set(event.clientX);
-    rawY.set(event.clientY);
-  }
 
   return (
     <section
@@ -163,26 +140,7 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
         )}
       </Shell>
 
-      {cursorEnabled && (
-        <motion.div
-          aria-hidden="true"
-          style={{ left: x, top: y }}
-          animate={{ scale: hovering ? 1 : 0, opacity: hovering ? 1 : 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          /* Translucent rather than a solid accent disc, so the site
-             underneath stays visible through it.
-             A low-opacity *accent* tint was the obvious first choice and is
-             wrong: at 25-30% over a white page (Hyde Park Wood, Taldo) it
-             resolves to near-white, leaving the white label with almost no
-             contrast, while over a near-black page (FixNex) it stays dark.
-             A neutral ink scrim behaves predictably over both, and the blur
-             keeps the label legible over busy content — the accent stays
-             in the ring instead, where it can't affect text contrast. */
-          className="pointer-events-none fixed z-50 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-ink/40 text-[11px] font-medium uppercase tracking-widest text-white backdrop-blur-md"
-        >
-          View site
-        </motion.div>
-      )}
+      {cursor}
     </section>
   );
 }

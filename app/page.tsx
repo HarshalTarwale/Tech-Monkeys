@@ -11,8 +11,15 @@ import {
 } from "@/lib/content";
 import type { Project } from "@/lib/content";
 
-/** The homepage ledger is a highlight reel, not the full catalogue. */
-const WORK_SECTION_LIMIT = 5;
+/**
+ * The homepage work section is a highlight reel, not the full catalogue —
+ * `/projects` is the full, filterable index.
+ *
+ * Three, because the section's layout is two half-width tiles above one
+ * full-width tile (see components/sections/work-grid.tsx). Changing this
+ * number without revisiting that layout would leave a half-empty row.
+ */
+const WORK_SECTION_LIMIT = 3;
 
 /**
  * Home route. Composition only — all content is read through lib/content,
