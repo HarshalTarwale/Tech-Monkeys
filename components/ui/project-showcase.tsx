@@ -1,30 +1,42 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useCallback, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { Arrow } from "@/components/ui/shell";
 import type { Project } from "@/lib/content";
 
 /**
- * A single large, interactive live-site window with a card-deck carousel.
+ * A large project window with a card-deck carousel, shown inside browser
+ * chrome so it reads as a real site rather than a generic bordered box.
  *
- * Each project is shown as a real embedded live site inside browser chrome —
- * proof, not a mockup. Only the active card's iframe is mounted, so a
- * division never holds more than one cross-origin frame in memory.
+ * Shows the real captured screenshot (`project.image`, from
+ * `scripts/capture-project-screenshots.mjs`) with the site's actual
+ * hostname in the address bar, and links out to the running site. It does
+ * NOT embed a live cross-origin iframe, and deliberately so — an earlier
+ * version did, and it caused two separate, confirmed scrolling bugs:
  *
- * Interaction model: the iframe activates on mouseenter and releases on
- * mouseleave — cursor into the window, scroll/click control it directly;
- * cursor out, control returns to the page immediately. This is a real
- * tradeoff, not a free win: a permanently-interactive iframe steals the
- * page's scroll the instant the cursor crosses it, and a visitor who tries
- * to scroll past the section with their cursor still over the window will
- * scroll the embedded site instead of the page. Binding release to
- * mouseleave (rather than requiring an explicit click to opt out) is what
- * keeps that recoverable: the moment the cursor exits the window — which
- * naturally happens the instant a visitor scrolls with the mouse over
- * something else, or just moves toward the next section — control comes
- * straight back. Escape is kept as a keyboard-only fallback.
+ *  1. **Scroll capture.** The iframe was inert (`pointer-events: none`)
+ *     until the cursor entered the window, at which point it became
+ *     interactive so a visitor could click around the embedded site. But
+ *     an interactive iframe owns the wheel: a visitor scrolling down the
+ *     page whose cursor happened to be over the window scrolled the
+ *     *embedded site* instead of the page. Because it depended entirely on
+ *     cursor position, it presented as "sometimes scrolling doesn't work"
+ *     — the hardest kind of bug to pin down, and the reason this is now a
+ *     flat image with nothing to capture.
+ *
+ *  2. **Main-thread blocking.** Three divisions each mounted an active
+ *     frame plus an offscreen "preload the next one" frame — measured at 4
+ *     live cross-origin frames and 1,097ms of total main-thread blocking
+ *     on the homepage. Lenis drives scroll from a `requestAnimationFrame`
+ *     loop, so blocking of that size *is* visible scroll stutter. Same
+ *     root cause, same fix, as components/ui/project-tile.tsx.
+ *
+ * A screenshot is still real proof: it's a capture of the real deployed
+ * site, the address bar shows the real hostname, and "Visit site" opens
+ * the running thing. Nothing here is a mockup.
  *
  * Transition: outgoing card scales down and fades while the incoming card
  * slides in from the right and settles — the "playing card" deal effect.
@@ -36,50 +48,14 @@ import type { Project } from "@/lib/content";
 export function ProjectShowcase({ projects }: { projects: Project[] }) {
   const reduced = useReducedMotion();
   const [[index, direction], setState] = useState<[number, number]>([0, 0]);
-  const [active, setActive] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  // Touch has no hover concept — mouseenter/leave never fires the way it
-  // does on a cursor device, so on touch the frame would activate on the
-  // first tap and then have no "leave" event to release it. Gated to fine
-  // pointers only; touch keeps the previous tap-to-activate behaviour via
-  // onClick, which still works underneath the pointer handlers below.
-  //
-  // Lazy useState initialiser, not a useEffect: this runs once during
-  // render rather than triggering a second render pass after mount (the
-  // effect version was flagged by react-hooks/set-state-in-effect —
-  // setState inside an effect body causes an avoidable cascading render).
-  // Still guarded for `window`: "use client" only means this can run in
-  // the browser, not that it's exempt from the initial SSR render pass,
-  // where window does not exist.
-  const [canHover] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-  );
 
   const count = projects.length;
   const project = projects[index];
-  const nextProject = count > 1 ? projects[(index + 1) % count] : undefined;
 
   const go = useCallback(
-    (next: number, dir: number) => {
-      setActive(false);
-      setState([(next + count) % count, dir]);
-    },
+    (next: number, dir: number) => setState([(next + count) % count, dir]),
     [count],
   );
-
-  // Escape is a keyboard-only escape hatch — mouseenter/mouseleave on the
-  // stage (below) is the primary activation path.
-  useEffect(() => {
-    if (!active) return;
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setActive(false);
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [active]);
 
   if (!project) return null;
 
@@ -110,9 +86,7 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
   };
 
   return (
-    // relative so the offscreen preload frame below is positioned against
-    // this box rather than escaping to the nearest positioned ancestor.
-    <div ref={wrapRef} className="relative">
+    <div className="relative">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div className="font-mono text-[10px] uppercase tracking-[.2em] text-faint">
           Selected engagements
@@ -129,11 +103,7 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
       {/* Fixed-height stage. The card is absolutely positioned inside it so
           the outgoing and incoming cards can overlap during the deal
           without the container's height twitching. */}
-      <div
-        className="relative aspect-4/3 w-full sm:aspect-16/11"
-        onPointerEnter={() => canHover && setActive(true)}
-        onPointerLeave={() => canHover && setActive(false)}
-      >
+      <div className="relative aspect-4/3 w-full sm:aspect-16/11">
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={project.slug}
@@ -156,35 +126,12 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
                     opacity: { duration: 0.5, ease: "easeOut" },
                   }
             }
-            className={`absolute inset-0 overflow-hidden rounded-2xl border bg-surface shadow-[0_28px_64px_-20px_rgba(20,20,22,.45)] transition-[border-color,box-shadow] duration-300 ${
-              active
-                ? "border-accent shadow-[0_28px_64px_-20px_rgba(61,90,254,.4)]"
-                : "border-line-strong"
-            }`}
+            className="absolute inset-0 overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-[0_28px_64px_-20px_rgba(20,20,22,.45)] transition-[border-color,box-shadow] duration-300 hover:border-accent hover:shadow-[0_28px_64px_-20px_rgba(61,90,254,.4)]"
           >
-            <ShowcaseFrame
-              project={project}
-              active={active}
-              onActivate={() => setActive(true)}
-            />
+            <ShowcaseFrame project={project} />
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* Warms the next project's frame in a 1px offscreen box so advancing
-          shows a rendered site immediately instead of a blank window. Only
-          the neighbour is warmed, so the page still never holds more than
-          two frames per division rather than one per project. */}
-      {count > 1 && nextProject?.url && (
-        <iframe
-          key={nextProject.slug}
-          src={nextProject.url}
-          title=""
-          aria-hidden="true"
-          tabIndex={-1}
-          className="pointer-events-none absolute h-px w-px opacity-0"
-        />
-      )}
 
       {/* Controls: prev/next plus direct-select dots. */}
       <div className="mt-5 flex items-center justify-between gap-4">
@@ -253,36 +200,12 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
 }
 
 /**
- * The window itself: browser chrome, the live iframe, and the metadata
- * strip. Split out so each card in the deck owns its own load state and a
- * newly-dealt card starts from a clean loading state.
+ * The window itself: browser chrome, the project's real cover screenshot,
+ * and the metadata strip.
  */
-function ShowcaseFrame({
-  project,
-  active,
-  onActivate,
-}: {
-  project: Project;
-  active: boolean;
-  onActivate: () => void;
-}) {
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    if (loaded || !project.url) return;
-    // A frame blocked by X-Frame-Options fires no error event — it just
-    // renders blank — so a timeout is the only reliable failure signal.
-    const timer = setTimeout(() => {
-      if (!loaded) setFailed(true);
-    }, 8000);
-    return () => clearTimeout(timer);
-  }, [loaded, project.url]);
-
-  const showFrame = project.url && !failed;
-
+function ShowcaseFrame({ project }: { project: Project }) {
   return (
-    <div className="flex h-full flex-col">
+    <div className="group/frame flex h-full flex-col">
       {/* Browser chrome: real macOS-style traffic-light colours (not flat
           grey dots) and a proper address bar with a lock icon, so the
           window reads as "an actual browser" at a glance rather than a
@@ -316,56 +239,20 @@ function ShowcaseFrame({
             {project.url ? new URL(project.url).hostname : project.name}
           </span>
         </div>
-        <span
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[9px] uppercase tracking-[.14em] transition-colors duration-300 ${
-            active ? "bg-accent text-white" : "bg-white/10 text-white/50"
-          }`}
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
-              active ? "animate-pulse bg-white" : "bg-white/40"
-            }`}
-          />
-          {active ? "Live" : "Preview"}
-        </span>
       </div>
 
-      <div className="relative min-h-0 flex-1 bg-bone">
-        {showFrame ? (
-          <>
-            <iframe
-              src={project.url}
-              title={`${project.name} — live site`}
-              loading="lazy"
-              onLoad={() => setLoaded(true)}
-              // Inert until activated: pointer-events off means the page
-              // keeps its own scroll while the visitor is just passing over.
-              className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-500 ${
-                active ? "" : "pointer-events-none"
-              } ${loaded ? "opacity-100" : "opacity-0"}`}
-            />
-
-            {!loaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-mono text-[10px] uppercase tracking-[.2em] text-faint">
-                  Loading live site…
-                </span>
-              </div>
-            )}
-
-            {/* Touch fallback: on a cursor device the stage's own
-                mouseenter/leave already activates the frame, so this veil
-                is invisible and only exists to give touch a tap target
-                (touch has no hover event to trigger activation with). */}
-            {!active && loaded && (
-              <button
-                type="button"
-                onClick={onActivate}
-                className="absolute inset-0"
-                aria-label={`Interact with the live ${project.name} site`}
-              />
-            )}
-          </>
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-bone">
+        {project.image ? (
+          // 4:3 source pinned to `object-top`, same contract as the
+          // /projects grid: this box is wider than 4:3, so the only crop
+          // that can happen is off the bottom — never the sides.
+          <Image
+            src={project.image}
+            alt={`${project.name} — homepage`}
+            fill
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            className="object-cover object-top transition-transform duration-700 ease-out group-hover/frame:scale-[1.03]"
+          />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
             <span className="font-mono text-[10px] uppercase tracking-[.16em] text-accent-deep">
@@ -389,12 +276,12 @@ function ShowcaseFrame({
           </span>
         </div>
         <a
-          href={project.url ?? "#contact"}
+          href={project.url ?? "/contact"}
           target={project.url ? "_blank" : undefined}
           rel={project.url ? "noreferrer" : undefined}
           className="group flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[.14em] text-muted transition-colors hover:text-accent"
         >
-          Visit
+          Visit site
           <Arrow spin />
         </a>
       </div>

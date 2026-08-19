@@ -190,10 +190,15 @@ export function ProjectTile({
               src={project.image}
               alt={`${project.name} — homepage`}
               fill
+              // Tiles live inside `Shell` (max-width 1600px) with 20/40px
+              // padding, so they are never actually 100vw. Saying "100vw"
+              // made the browser fetch the 1920px variant to fill a box
+              // that measures 1360px — a whole size step of wasted bytes
+              // on every full-width tile. These describe the real box.
               sizes={
                 featured || wide
-                  ? "100vw"
-                  : "(min-width: 640px) 50vw, 100vw"
+                  ? "(min-width: 1680px) 1600px, calc(100vw - 80px)"
+                  : "(min-width: 1680px) 790px, (min-width: 640px) calc(50vw - 50px), calc(100vw - 40px)"
               }
               className="object-cover object-top"
             />

@@ -619,3 +619,62 @@ Verified: clean typecheck / lint / build; mobile featured caption stacks
 marker -> name -> scope at 390px; no horizontal overflow at 390 / 1440px;
 zero tiles left below 0.95 opacity after scrolling either page, in normal
 and reduced motion.
+
+---
+
+## Scroll bug, second cause: division showcase iframes (2026-08-20)
+
+Client reported intermittent "sometimes it doesn't scroll properly" after
+the /projects and homepage-work embeds had already been converted to
+screenshots. `components/ui/project-showcase.tsx` — the carousel in each
+homepage division — was still mounting live cross-origin iframes and was
+missed in that first pass. Two separate defects, one component:
+
+**1. Scroll capture (the intermittent part).** The frame was inert until
+the cursor entered the window, then became interactive so a visitor could
+click around the embedded site. An interactive iframe owns the wheel, so a
+visitor scrolling down the page whose cursor happened to be over the
+window scrolled the *embedded site* instead of the page. Entirely
+cursor-position dependent, which is exactly why it presented as
+"sometimes". The component's own doc comment had described this as a known
+tradeoff since it was written; it was not a regression, it was accepted
+behaviour that should not have been.
+
+**2. Main-thread blocking.** Each division mounted an active frame plus an
+offscreen "warm the next one" frame — measured 4 live cross-origin frames
+and 1,097ms of total blocking on the homepage. Lenis drives scroll from a
+`requestAnimationFrame` loop, so blocking of that size is visible stutter.
+Same root cause and same fix as project-tile.tsx.
+
+Both are gone: the showcase now renders `project.image` (the real capture)
+inside the same browser chrome, with the real hostname in the address bar
+and a "Visit site" link out. Verified 0 iframes on every route.
+
+Honest note on what is *not* resolved: after the fix the homepage still
+records a few hundred ms of longtask during a scripted scroll, but repeat
+runs on the same build ranged 256–790ms, and an A/B that disabled the
+header `backdrop-blur`, the grain overlay, the divisions parallax, the
+marquee and finally all images measured *worse than baseline* in three of
+five cases. That is noise exceeding effect, so nothing further was
+attributed or "fixed" on the strength of it. A CPU profile put ~75% of
+scroll time in idle and under 2% in our own JS; the remaining work is
+browser raster/layout, not application code. Re-measure on a quiet machine
+before chasing it.
+
+Also corrected in the same pass:
+- `app/layout.tsx` imported `site` from `content/site` directly, bypassing
+  the `lib/content` rule in AGENTS.md. Now goes through lib/content.
+- Added `app/sitemap.ts` and `app/robots.ts`. Service URLs derive from
+  `getServiceDetailSlugs()` — the same list driving `generateStaticParams`
+  — so the sitemap cannot drift from the routes that actually exist.
+- Deleted the five unreferenced `create-next-app` SVGs from `public/`.
+- Tightened `sizes` on full-bleed project tiles: they sit inside `Shell`
+  (max 1600px) with 20/40px padding and so are never 100vw. Note this did
+  not reduce transfer at 1440px — a 1360px box still correctly selects the
+  1920 variant — but it stops overstating the box at other widths, and
+  mobile resolves to ~390px and picks 640w regardless.
+
+Verified: clean typecheck / lint / build; all 14 routes audited for
+horizontal overflow, broken images, missing alt, h1 count, unlabelled
+links and buttons, title/meta description, console errors and failed
+requests — all clean; every internal link target returns 200.

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { site } from "@/content/site";
+// Via lib/content, not content/site directly — AGENTS.md: nothing reads
+// content/ straight, so the publication gate can never be bypassed.
+import { site } from "@/lib/content";
 import "./globals.css";
 
 // Variable weights: display headings use 900, body 400-500.
