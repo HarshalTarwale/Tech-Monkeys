@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import {
   motion,
@@ -82,8 +83,9 @@ export function Capabilities({ services }: { services: Service[] }) {
               //     essentially unchanged, while both still visibly grow.
               //   Both share origin-left so they grow away from the number
               //   column rather than into the summary text on the right.
-              <article
+              <Link
                 key={service.slug}
+                href={`/services/${service.slug}`}
                 className="group grid items-center gap-5 border-b border-line-strong py-10 md:grid-cols-[80px_1fr_1fr] md:py-14"
               >
                 <span className="origin-left font-mono text-[14px] text-accent-deep transition-[color,scale] duration-300 ease-out group-hover:scale-[1.08] group-hover:text-accent md:text-[20px]">
@@ -93,7 +95,7 @@ export function Capabilities({ services }: { services: Service[] }) {
                   {service.title}
                 </h3>
                 <p className="leading-relaxed text-muted">{service.summary}</p>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
