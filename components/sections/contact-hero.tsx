@@ -1,50 +1,56 @@
-import { MagneticButton } from "@/components/ui/magnetic-button";
+import { ContactForm } from "@/components/sections/contact-form";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
 import { getAbout, getContactPage, site } from "@/lib/content";
 
 /**
- * Contact-page opener.
+ * Contact-page opener: heading on the left, the real enquiry form on the
+ * right — the form is the primary action on this page, so it sits where a
+ * visitor sees it without scrolling rather than further down the page.
  *
- * Plain server-rendered heading, no animation gating it — same LCP
- * discipline as every other hero on the site (AGENTS.md motion
- * constraints). The CTA row carries the two real, verifiable ways to reach
- * the studio right now: a mailto to `site.email` (no working form exists
- * yet — see the site-wide mailto pattern in header/about/footer) and the
- * studio's real location from `content/about.ts`, rather than a fabricated
- * office address or phone number.
+ * The heading itself stays plain server-rendered markup with no animation
+ * gating it, same LCP discipline as every other hero on the site (AGENTS.md
+ * motion constraints); `ContactForm` is the one client island here.
+ *
+ * The mailto link stays as a visible fallback, not a hidden option — the
+ * form depends on `RESEND_API_KEY` being configured (see the TODO(client)
+ * in app/api/contact/route.ts) and on JavaScript running at all, neither
+ * guaranteed on day one.
  */
 export function ContactHero() {
   const contact = getContactPage();
   const about = getAbout();
 
   return (
-    <section className="grain relative overflow-hidden bg-bone pb-16 pt-32 md:pb-20 md:pt-40">
+    <section className="grain relative overflow-hidden bg-bone pb-20 pt-32 md:pb-28 md:pt-40">
       <Shell className="relative px-5 md:px-10">
-        <Eyebrow>{contact.eyebrow}</Eyebrow>
+        <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+          <div>
+            <Eyebrow>{contact.eyebrow}</Eyebrow>
 
-        <h1 className="mt-6 max-w-4xl text-[clamp(2.75rem,1.4rem+4.6vw,6rem)] font-black leading-[.92] tracking-[-.045em] text-ink">
-          {contact.heading.lead}
-          <br />
-          {contact.heading.emphasis}
-        </h1>
+            <h1 className="mt-6 text-[clamp(2.5rem,1.3rem+4.2vw,5.25rem)] font-black leading-[.94] tracking-[-.045em] text-ink">
+              {contact.heading.lead}
+              <br />
+              {contact.heading.emphasis}
+            </h1>
 
-        <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
-          {contact.intro}
-        </p>
+            <p className="mt-8 max-w-md text-lg leading-relaxed text-muted">
+              {contact.intro}
+            </p>
 
-        <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-          <MagneticButton href={`mailto:${site.email}`} size="lg">
-            Start a conversation
-          </MagneticButton>
-          <a
-            href={`mailto:${site.email}`}
-            className="group inline-flex items-center gap-2 border-b-2 border-transparent pb-1 text-sm font-medium uppercase tracking-[.14em] text-muted transition-colors hover:border-accent hover:text-accent"
-          >
-            {site.email} <Arrow spin />
-          </a>
-          <span className="font-mono text-[11px] uppercase tracking-[.2em] text-faint">
-            {about.location}
-          </span>
+            <div className="mt-10 flex flex-col gap-3 border-t border-line-strong pt-7 lg:mt-24">
+              <a
+                href={`mailto:${site.email}`}
+                className="group inline-flex w-fit items-center gap-2 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:text-accent"
+              >
+                {site.email} <Arrow spin />
+              </a>
+              <span className="font-mono text-[11px] uppercase tracking-[.2em] text-faint">
+                Or write directly, if you&apos;d rather · {about.location}
+              </span>
+            </div>
+          </div>
+
+          <ContactForm />
         </div>
       </Shell>
     </section>
