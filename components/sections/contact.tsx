@@ -14,7 +14,18 @@ import { footerNav, site } from "@/lib/content";
  * `showCta={false}` and get the footer only; the homepage keeps the full
  * block and is unchanged.
  */
-export function Contact({ showCta = true }: { showCta?: boolean }) {
+export function Contact({
+  showCta = true,
+  ctaEyebrow = "04 / Start here",
+}: {
+  showCta?: boolean;
+  /**
+   * The homepage numbers this as its fourth section; pages with a
+   * different section count reusing the CTA (e.g. /contact) pass their
+   * own label rather than showing a number that doesn't apply.
+   */
+  ctaEyebrow?: string;
+}) {
   return (
     <footer
       id="contact"
@@ -23,7 +34,7 @@ export function Contact({ showCta = true }: { showCta?: boolean }) {
       <Shell>
         {showCta && (
           <div className="border-l-2 border-accent pl-6 md:pl-12">
-            <Eyebrow>04 / Start here</Eyebrow>
+            <Eyebrow>{ctaEyebrow}</Eyebrow>
             <h2 className="mt-7 max-w-5xl text-5xl font-black leading-[.95] tracking-[-.055em] text-ink md:text-8xl">
               Move quickly.
               <br />

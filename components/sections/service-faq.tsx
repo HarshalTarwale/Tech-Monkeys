@@ -24,7 +24,18 @@ import type { ServiceDetail } from "@/lib/content";
  * long answer. The global reduced-motion rule zeroes the transition, so no
  * separate branch is needed here.
  */
-export function ServiceFaq({ faqs }: { faqs: NonNullable<ServiceDetail["faqs"]> }) {
+export function ServiceFaq({
+  faqs,
+  eyebrow = "05 / Questions",
+}: {
+  faqs: NonNullable<ServiceDetail["faqs"]>;
+  /**
+   * Service pages number this as their fifth section; reused as-is on
+   * pages with a different section count (e.g. /contact) would show a
+   * stale ordinal, so callers outside that flow pass their own label.
+   */
+  eyebrow?: string;
+}) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -35,7 +46,7 @@ export function ServiceFaq({ faqs }: { faqs: NonNullable<ServiceDetail["faqs"]> 
       <Shell>
         <div className="grid gap-14 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
           <div className="lg:sticky lg:top-28 lg:h-fit">
-            <Eyebrow>05 / Questions</Eyebrow>
+            <Eyebrow>{eyebrow}</Eyebrow>
             <h2 className="mt-7 text-4xl font-black tracking-[-.04em] text-ink md:text-6xl">
               Before you ask,
               <br />

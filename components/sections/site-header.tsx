@@ -171,7 +171,7 @@ export function SiteHeader({
             320px floor where wordmark + CTA + hamburger exceed the
             available width unless something is allowed to compress. */}
         <div className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-5">
-          <MagneticButton href="/#contact" className="shrink-0">
+          <MagneticButton href="/contact" className="shrink-0">
             Get in touch
           </MagneticButton>
 

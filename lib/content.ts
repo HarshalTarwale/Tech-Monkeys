@@ -1,4 +1,5 @@
 import { about } from "@/content/about";
+import { contact } from "@/content/contact";
 import { divisions, projects } from "@/content/projects";
 import { services } from "@/content/services";
 import { serviceDetails } from "@/content/services/details";
@@ -115,6 +116,11 @@ export function getTestimonials(): Testimonial[] {
 /** About-page content. See content/about.ts for sourcing notes. */
 export function getAbout() {
   return about;
+}
+
+/** Contact-page content. See content/contact.ts for sourcing notes. */
+export function getContactPage() {
+  return contact;
 }
 
 export { footerNav, nav, site };
