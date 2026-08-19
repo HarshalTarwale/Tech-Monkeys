@@ -1,7 +1,6 @@
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { ServiceMockup } from "@/components/ui/service-mockup";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
-import { site } from "@/lib/content";
 import type { Service, ServiceDetail } from "@/lib/content";
 
 /**
@@ -96,7 +95,7 @@ export function ServiceHero({
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-              <MagneticButton href={`mailto:${site.email}`} size="lg">
+              <MagneticButton href="/contact" size="lg">
                 Start a project
               </MagneticButton>
               <a

@@ -17,6 +17,7 @@ import { footerNav, site } from "@/lib/content";
 export function Contact({
   showCta = true,
   ctaEyebrow = "04 / Start here",
+  ctaHref = "/contact",
 }: {
   showCta?: boolean;
   /**
@@ -25,6 +26,15 @@ export function Contact({
    * own label rather than showing a number that doesn't apply.
    */
   ctaEyebrow?: string;
+  /**
+   * Defaults to the real enquiry form at /contact — every page except
+   * /contact itself reaches this CTA before it's seen that form, so it's
+   * the right destination. /contact's own usage overrides this to a direct
+   * mailto: a visitor who scrolled past the form up top without using it
+   * gets a second, different way to reach out, not a link back to the page
+   * they're already on.
+   */
+  ctaHref?: string;
 }) {
   return (
     <footer
@@ -48,11 +58,7 @@ export function Contact({
             {/* Same magnetic-pull + fill-sweep treatment as the header's
                 "Get in touch", at the "lg" size variant for this section's
                 larger scale. */}
-            <MagneticButton
-              href={`mailto:${site.email}`}
-              size="lg"
-              className="mt-10"
-            >
+            <MagneticButton href={ctaHref} size="lg" className="mt-10">
               Start a conversation
             </MagneticButton>
           </div>

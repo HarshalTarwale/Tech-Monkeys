@@ -104,7 +104,7 @@ export function Hero({
             Explore divisions
           </a>
           <a
-            href="#contact"
+            href="/contact"
             className="inline-flex h-14 items-center rounded-full border border-ink/20 px-7 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
           >
             Start a project

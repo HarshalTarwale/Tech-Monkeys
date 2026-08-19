@@ -10,6 +10,7 @@ import {
   getContactPage,
   getServiceDetailSlugs,
   getServices,
+  site,
 } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -34,6 +35,11 @@ export const metadata: Metadata = {
  * to pull a visitor *toward* contact from elsewhere, but redundant on the
  * page they already reached. `Contact`'s own "Move quickly. Build
  * something that lasts." CTA closes it out instead.
+ *
+ * `ctaHref` is overridden to a direct mailto here: `Contact`'s default
+ * sends every other page to /contact, but a visitor already on /contact
+ * who scrolled past the form without using it needs an actual alternative,
+ * not a link back to the page they're standing on.
  */
 export default function ContactPage() {
   const contact = getContactPage();
@@ -53,7 +59,7 @@ export default function ContactPage() {
       />
       <ServiceFaq faqs={contact.faqs} eyebrow="Questions" />
 
-      <Contact ctaEyebrow="Start here" />
+      <Contact ctaEyebrow="Start here" ctaHref={`mailto:${site.email}`} />
     </>
   );
 }

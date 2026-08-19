@@ -79,7 +79,7 @@ function DivisionBlock({
               the same 2px of space so the line appearing on hover doesn't
               nudge anything below it. */}
           <a
-            href="#contact"
+            href="/contact"
             className="group mt-9 inline-flex items-center gap-2 border-b-2 border-transparent pb-1 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:border-accent hover:text-accent"
           >
             Engage this division <Arrow spin />

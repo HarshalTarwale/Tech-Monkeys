@@ -55,12 +55,11 @@ export function ServiceCta() {
           <Reveal delay={0.24}>
             <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-5">
               {/* tone="light" — an ink pill on an ink background is very
-                  nearly invisible (measured #141416 on #141416). */}
-              <MagneticButton
-                href={`mailto:${site.email}`}
-                size="lg"
-                tone="light"
-              >
+                  nearly invisible (measured #141416 on #141416). Routes to
+                  the real form at /contact rather than straight to mailto:
+                  the small text link beside it is the direct-email
+                  fallback, same split as contact-hero.tsx. */}
+              <MagneticButton href="/contact" size="lg" tone="light">
                 Start a project
               </MagneticButton>
 

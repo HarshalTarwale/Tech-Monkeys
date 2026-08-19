@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -17,21 +18,34 @@ const PER_PAGE = 2;
 /**
  * Large image-style panel pair with a centred prev/next pill — the
  * structure the client pointed at directly (tentwenty's case-studies
- * section: two big panels, a logo/name centred in each, a caption line
- * below, arrows in the middle). Third rebuild of this section: a reused
- * `ProjectShowcase` (the homepage's live-iframe carousel) read as a smaller
- * repeat of a section already seen once, and a plain name list read as too
- * quiet either way.
+ * section: two big panels, a caption line below, arrows in the middle).
  *
- * No client logos or photography in the panels — we don't have real image
- * assets for these projects, and the alternative (stock imagery, an
- * invented logo) breaks the "never fabricate" rule the whole site runs on.
- * The panel's *type* is the visual instead: the project name set very
- * large, the way the panel content in a proper editorial layout would be —
- * honest about being type, not pretending to be a photo. Alternating
- * ink/bordered treatment gives the same light/dark rhythm the reference's
- * alternating cream/photo cards have, without inventing a colour per
- * project (this site keeps a single accent colour by design).
+ * Media, in the same priority order as the /projects grid
+ * (components/ui/project-tile.tsx):
+ *
+ *   1. `project.video` — not set on anything yet; the field exists so
+ *      dropping a file in /public and setting the path is the only change
+ *      needed once footage exists. Muted+looped on hover, same as the grid.
+ *   2. `project.image` — the real cover screenshot in /public, generated
+ *      by `scripts/capture-project-screenshots.mjs`. What every
+ *      publishable project actually has today.
+ *   3. `TypePanel` — the project name set very large, for the rare project
+ *      with neither. Was the *only* treatment here originally, when no
+ *      image assets existed yet; kept as the honest fallback now that most
+ *      panels don't need it, rather than assuming every future project
+ *      will always have a screenshot.
+ *
+ * A scrim sits under the caption on photo panels specifically because the
+ * real screenshots run from near-white (Taldo, Hyde Park Wood) to
+ * near-black (FixNex) — without it, white caption text disappears on the
+ * light ones. The type-only fallback doesn't need one; it sets its own
+ * ink/white contrast directly.
+ *
+ * "Visit site" is a second, explicit link inside the panel rather than
+ * relying on the whole card being clickable — the card *is* still a link
+ * (whole-panel click still opens the project), but a visitor scanning for
+ * "how do I actually see this" gets a labelled answer instead of having to
+ * discover it by hovering.
  *
  * Paginates two at a time rather than scrolling — matches the reference's
  * fixed two-up layout, and two large panels read better than a scroll rail
@@ -63,89 +77,31 @@ export function ProjectPanels({ projects }: { projects: Project[] }) {
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map((project, i) => {
             const globalIndex = page * PER_PAGE + i;
-            const dark = globalIndex % 2 === 0;
             return (
-              <motion.a
-                key={project.slug}
-                href={project.url ?? "/#contact"}
-                target={project.url ? "_blank" : undefined}
-                rel={project.url ? "noreferrer" : undefined}
-                initial={reduced ? undefined : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? undefined : { opacity: 0, y: -16 }}
-                transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className={`group relative flex aspect-4/3 flex-col overflow-hidden p-8 transition-colors duration-300 ${
-                  dark
-                    ? "bg-ink text-white hover:bg-[#1c1c1f]"
-                    : "border-2 border-ink bg-surface text-ink hover:bg-bone"
-                }`}
-              >
-                {/* Oversized ghost initial — the same watermark language the
-                    hero and process sections already use, so the panel
-                    doesn't feel like a foreign component. */}
-                <span
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute -right-4 top-1/2 -translate-y-1/2 select-none text-[13rem] font-black leading-none ${
-                    dark ? "text-white/5" : "text-ink/[.04]"
-                  }`}
-                >
-                  {project.name.charAt(0)}
-                </span>
-
-                <div className="relative flex items-start justify-between">
-                  <span
-                    className={`font-mono text-[10px] uppercase tracking-[.2em] ${dark ? "text-accent" : "text-accent-deep"}`}
-                  >
-                    {project.sector}
-                  </span>
-                  <span
-                    className={`font-mono text-[10px] ${dark ? "text-white/40" : "text-faint"}`}
-                  >
-                    {String(globalIndex + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                {/* Centred in the remaining space — the panel's equivalent
-                    of the reference's centred logo, rather than pinned to
-                    an edge with empty space above it. */}
-                <div className="relative flex flex-1 items-center">
-                  <h3 className="text-3xl font-black leading-[1.05] tracking-[-.03em] sm:text-4xl">
-                    {project.name}
-                  </h3>
-                </div>
-
-                <div className="relative flex items-end justify-between gap-3">
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tags.slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[.1em] ${
-                          dark ? "border-white/20 text-white/60" : "border-line-strong text-muted"
-                        }`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <Arrow
-                    spin
-                    className={dark ? "text-white/60 group-hover:text-accent" : "text-muted group-hover:text-accent"}
-                  />
-                </div>
-              </motion.a>
+              <ProjectPanel key={project.slug} project={project} index={globalIndex} reduced={reduced} />
             );
           })}
         </AnimatePresence>
       </div>
 
       {/* Captions below each panel, matching the reference's name-under-image
-          pattern — segment + a direct "visit" cue, since the panel itself
-          only carries the name and sector. */}
+          pattern — segment on one side, an explicit visit cue on the other. */}
       <div className="mt-4 grid gap-5 font-mono text-[10px] uppercase tracking-[.14em] text-faint sm:grid-cols-2">
         {visible.map((project) => (
           <div key={project.slug} className="flex items-center justify-between">
             <span>{SCALE_LABEL[project.segment]}</span>
-            <span>{project.name}</span>
+            {project.url ? (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-ink transition-colors hover:text-accent"
+              >
+                Visit {project.name} <Arrow spin />
+              </a>
+            ) : (
+              <span>{project.name}</span>
+            )}
           </div>
         ))}
       </div>
@@ -176,6 +132,159 @@ export function ProjectPanels({ projects }: { projects: Project[] }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ProjectPanel({
+  project,
+  index,
+  reduced,
+}: {
+  project: Project;
+  index: number;
+  reduced: boolean | null;
+}) {
+  const dark = index % 2 === 0;
+
+  return (
+    <motion.a
+      href={project.url ?? "/#contact"}
+      target={project.url ? "_blank" : undefined}
+      rel={project.url ? "noreferrer" : undefined}
+      initial={reduced ? undefined : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduced ? undefined : { opacity: 0, y: -16 }}
+      transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative flex aspect-4/3 flex-col overflow-hidden"
+    >
+      {project.image ? (
+        <>
+          {/* Fixed source ratio matching the capture script's own 4:3
+              output and `object-top`, same as the /projects grid — the
+              only crop that can ever happen is off the bottom, never the
+              sides. */}
+          <Image
+            src={project.image}
+            alt={`${project.name} — homepage`}
+            fill
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+          {/* Two independent scrims rather than one three-stop gradient — a
+              single from/via/to gradient necessarily dips lightest in the
+              middle, which is exactly where the top row (sector + index)
+              sits, and against a bright capture like Hyde Park Wood's or
+              Taldo's that dip left it nearly unreadable. Two scrims, each
+              anchored to the content it protects, keep both rows legible
+              regardless of how light or dark the source screenshot is. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black/60 to-transparent"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/90 to-transparent transition-colors duration-300 group-hover:from-black/95"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-accent/0 transition-colors duration-500 group-hover:bg-accent/10"
+          />
+
+          <PanelContent project={project} index={index} tone="photo" />
+        </>
+      ) : (
+        <div
+          className={`flex h-full flex-col p-8 transition-colors duration-300 ${
+            dark
+              ? "bg-ink text-white hover:bg-[#1c1c1f]"
+              : "border-2 border-ink bg-surface text-ink hover:bg-bone"
+          }`}
+        >
+          {/* Oversized ghost initial — the same watermark language the
+              hero and process sections already use — for the rare project
+              without a screenshot yet. */}
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none absolute -right-4 top-1/2 -translate-y-1/2 select-none text-[13rem] font-black leading-none ${
+              dark ? "text-white/5" : "text-ink/4"
+            }`}
+          >
+            {project.name.charAt(0)}
+          </span>
+
+          <PanelContent project={project} index={index} tone={dark ? "dark" : "light"} />
+        </div>
+      )}
+    </motion.a>
+  );
+}
+
+/**
+ * Shared caption chrome across all three panel treatments (photo, dark
+ * type, light type) — sector + index up top, name + a "Visit site" cue
+ * pinned to the bottom, so a photo panel and a type-only panel read as the
+ * same component wearing different skins, not two different layouts.
+ */
+function PanelContent({
+  project,
+  index,
+  tone,
+}: {
+  project: Project;
+  index: number;
+  tone: "photo" | "dark" | "light";
+}) {
+  const textDim = tone === "light" ? "text-muted" : "text-white/60";
+  const textFaint = tone === "light" ? "text-faint" : "text-white/40";
+  const accent = tone === "light" ? "text-accent-deep" : "text-accent";
+
+  return (
+    <div className="relative flex h-full flex-col justify-between p-6 sm:p-7">
+      <div className="flex items-start justify-between">
+        <span className={`font-mono text-[10px] uppercase tracking-[.2em] ${accent}`}>
+          {project.sector}
+        </span>
+        <span className={`font-mono text-[10px] ${textFaint}`}>
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+
+      <div>
+        <h3
+          className={`text-2xl font-black leading-[1.05] tracking-[-.03em] sm:text-3xl ${
+            tone === "light" ? "text-ink" : "text-white"
+          }`}
+        >
+          {project.name}
+        </h3>
+
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[.1em] ${
+                  tone === "light"
+                    ? "border-line-strong text-muted"
+                    : "border-white/25 text-white/70"
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {project.url && (
+            <span
+              className={`inline-flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[.14em] transition-colors ${textDim} group-hover:${tone === "light" ? "text-accent-deep" : "text-accent"}`}
+            >
+              Visit site
+              <Arrow spin className={tone === "light" ? "text-muted" : "text-white/60"} />
+            </span>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
