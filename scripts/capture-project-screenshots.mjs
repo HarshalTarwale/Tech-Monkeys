@@ -33,10 +33,24 @@ import { projects } from "../content/projects/index.ts";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "..", "public", "projects");
 
-// Same fixed logical width the hover-embed itself renders at
-// (components/ui/project-tile.tsx's EMBED_WIDTH) — keeps the static cover
-// and the live hover-embed showing the same layout, not two different ones.
-const VIEWPORT = { width: 1280, height: 900 };
+// Width matches the hover-embed's own logical viewport
+// (components/ui/project-tile.tsx's EMBED_WIDTH), so the static cover and
+// the live embed show the same layout rather than two different crops.
+//
+// The 4:3 height is deliberate. Every tile in the grid is 4:3 or wider, and
+// covers are pinned to `object-top` — so a 4:3 source is either shown whole
+// (in a 4:3 tile) or cropped only from the bottom (in a wider one). Nothing
+// is ever cropped horizontally, which is what was chopping the sides off
+// each project's hero. Capture taller than this and 4:3 tiles start cropping
+// sideways again; capture wider and the hero loses its lower half.
+const VIEWPORT = { width: 1280, height: 960 };
+
+// Retina capture. The featured tile renders ~1360px wide on a 1440 viewport,
+// so a 1x source would be upscaled and visibly soft — the "not clear" part
+// of the problem. next/image downscales and re-encodes these per breakpoint,
+// so the extra source pixels cost repo weight, never page weight.
+const DEVICE_SCALE = 2;
+
 const NAV_TIMEOUT_MS = 20_000;
 const SETTLE_MS = 600;
 
@@ -54,7 +68,10 @@ if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 console.log(`Capturing ${targets.length} project screenshot(s)...\n`);
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: VIEWPORT });
+const page = await browser.newPage({
+  viewport: VIEWPORT,
+  deviceScaleFactor: DEVICE_SCALE,
+});
 
 const results = [];
 for (const project of targets) {
@@ -70,7 +87,15 @@ for (const project of targets) {
     console.warn(`  ${project.slug}: networkidle timed out, capturing anyway`);
   }
   await page.waitForTimeout(SETTLE_MS);
-  await page.screenshot({ path: dest, type: "jpeg", quality: 82 });
+  // Explicit clip: some sites set a body height that makes Playwright's
+  // default capture taller than the viewport, which would break the 4:3
+  // contract the tile crops rely on.
+  await page.screenshot({
+    path: dest,
+    type: "jpeg",
+    quality: 85,
+    clip: { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height },
+  });
   console.log(`  ✓ ${project.slug} -> public/projects/${project.slug}.jpg`);
   results.push(project.slug);
 }

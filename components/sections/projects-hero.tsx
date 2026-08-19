@@ -37,12 +37,12 @@ export function ProjectsHero({ total }: { total: number }) {
           live and public.
         </h1>
 
-        {/* Deliberately no "hover to preview" instruction: the previews are
-            live on load, not on hover, and touch devices have no hover at
-            all — the sentence would have been wrong on both counts. */}
+        {/* Wording carries no "hover to preview" instruction: touch devices
+            never get the hover embed, so the sentence would be wrong for
+            every visitor on a phone. "Open any one" is true everywhere. */}
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
-          Not mockups or concept work. Every tile below is the real site,
-          running live right now — tap any one to open it properly.
+          Not mockups or concept work. Every project below is a real site,
+          running live right now — open any one and see for yourself.
         </p>
       </Shell>
     </section>

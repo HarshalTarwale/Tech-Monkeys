@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { Arrow } from "@/components/ui/shell";
@@ -70,12 +71,27 @@ export const CATEGORY_LABEL: Record<ServiceCategory, string> = {
 export function ProjectTile({
   project,
   wide,
+  featured,
+  index,
   onPointerEnter,
   onPointerLeave,
 }: {
   project: Project;
   /** Full-bleed row rather than a half-width cell. */
   wide?: boolean;
+  /**
+   * Lead treatment: a taller frame and an editorial two-column caption
+   * carrying the project's real `scope` sentence. Used for the first tile
+   * so the page opens on one project rather than a uniform catalogue —
+   * a grid where every cell is identical gives a visitor no route in.
+   */
+  featured?: boolean;
+  /**
+   * Position in the rendered list, for the `01 / 02 / 03` marker. Counts
+   * the visible grid, so it stays sequential under a category filter
+   * instead of exposing gaps from the full set.
+   */
+  index?: number;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
 }) {
@@ -142,7 +158,13 @@ export function ProjectTile({
     >
       <div
         ref={frameRef}
-        className={`relative overflow-hidden bg-bone ${wide ? "aspect-video" : "aspect-4/3"}`}
+        // Every ratio here is 4:3 or wider, matching the 4:3 capture, so a
+        // cover is either shown whole or trimmed off the bottom — never
+        // pinched horizontally. The old `2.2/1` featured frame cut each
+        // site's hero in half and is gone.
+        className={`relative overflow-hidden bg-bone ${
+          featured ? "aspect-4/3 md:aspect-video" : wide ? "aspect-video" : "aspect-4/3"
+        }`}
       >
         {/* Media scales up fractionally on hover — transform only, so the
             grid never reflows. */}
@@ -158,14 +180,22 @@ export function ProjectTile({
               className="h-full w-full object-cover"
             />
           ) : project.image ? (
-            // A captured screenshot at a fixed source size, not an
-            // optimisable responsive asset — next/image's benefits don't
-            // apply and its remote-pattern config isn't relevant here.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            // Captured at 2x (see the capture script), so next/image has
+            // real pixels to work with and the cover stays sharp even in
+            // the featured tile, which renders ~1360px wide on desktop.
+            // `object-top` is what keeps each project's hero in frame: the
+            // source is 4:3 and every tile is 4:3 or wider, so the only
+            // crop that can ever happen is off the bottom.
+            <Image
               src={project.image}
-              alt=""
-              className="h-full w-full object-cover object-top"
+              alt={`${project.name} — homepage`}
+              fill
+              sizes={
+                featured || wide
+                  ? "100vw"
+                  : "(min-width: 640px) 50vw, 100vw"
+              }
+              className="object-cover object-top"
             />
           ) : (
             <TypePanel project={project} />
@@ -211,21 +241,75 @@ export function ProjectTile({
         />
       </div>
 
-      <div className="mt-5 flex items-start justify-between gap-4">
-        <h3 className="text-2xl font-black tracking-[-.03em] text-ink transition-colors duration-300 group-hover:text-accent md:text-3xl">
-          {project.name}
-        </h3>
-        <Arrow
-          spin
-          className="mt-2 shrink-0 text-faint transition-colors duration-300 group-hover:text-accent"
-        />
-      </div>
+      {featured ? (
+        // Editorial two-column caption. The right-hand column carries the
+        // project's real `scope` sentence — the one place on this page a
+        // visitor learns what the work actually was before clicking.
+        <div className="mt-6 grid gap-x-10 gap-y-4 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <IndexMark index={index} featured />
+            <h3 className="mt-3 text-4xl font-black leading-[.95] tracking-[-.04em] text-ink transition-colors duration-300 group-hover:text-accent md:text-5xl lg:text-6xl">
+              {project.name}
+            </h3>
+          </div>
+          <div className="flex items-start justify-between gap-6 md:col-span-5">
+            <p className="max-w-md text-base leading-relaxed text-muted">
+              {project.scope}
+            </p>
+            <Arrow
+              spin
+              className="mt-1 shrink-0 text-faint transition-colors duration-300 group-hover:text-accent"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-5 flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <IndexMark index={index} />
+            <h3 className="mt-2 text-2xl font-black tracking-[-.03em] text-ink transition-colors duration-300 group-hover:text-accent md:text-3xl">
+              {project.name}
+            </h3>
+          </div>
+          <Arrow
+            spin
+            className="mt-2 shrink-0 text-faint transition-colors duration-300 group-hover:text-accent"
+          />
+        </div>
+      )}
 
-      <div className="mt-4 flex items-center justify-between gap-4 border-t border-line-strong pt-4 font-mono text-[10px] uppercase tracking-[.18em] text-muted">
+      <div
+        className={`flex items-center justify-between gap-4 border-t border-line-strong font-mono text-[10px] uppercase tracking-[.18em] text-muted ${
+          featured ? "mt-8 pt-5" : "mt-4 pt-4"
+        }`}
+      >
         <span>{CATEGORY_LABEL[project.category]}</span>
         <span className="text-faint">{project.sector}</span>
       </div>
     </a>
+  );
+}
+
+/**
+ * The `01 / 02 / 03` marker above each project name.
+ *
+ * Sits above the name rather than over the screenshot deliberately: our
+ * covers run from near-white (Taldo, Hyde Park Wood) to near-black
+ * (FixNex), so any number overlaid on the image would need a scrim to stay
+ * legible on both — and that scrim would dull the very thing the tile
+ * exists to show. Above the name it is always ink-on-bone.
+ */
+function IndexMark({ index, featured }: { index?: number; featured?: boolean }) {
+  if (index === undefined) return null;
+  return (
+    <span className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[.2em]">
+      <span className="text-faint">{String(index + 1).padStart(2, "0")}</span>
+      {featured && (
+        <>
+          <span className="h-px w-6 bg-line-strong" />
+          <span className="text-accent-deep">Featured project</span>
+        </>
+      )}
+    </span>
   );
 }
 

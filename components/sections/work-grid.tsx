@@ -1,5 +1,6 @@
 "use client";
 
+import { Reveal } from "@/components/motion/reveal";
 import { ProjectTile } from "@/components/ui/project-tile";
 import { useViewCursor } from "@/components/ui/view-cursor";
 import type { Project } from "@/lib/content";
@@ -37,14 +38,22 @@ export function WorkGrid({ projects }: { projects: Project[] }) {
           // shape — which also keeps a 1- or 2-project fallback tidy.
           const wide = i === lastIndex && lastIndex % 2 === 0;
           return (
-            <div key={project.slug} className={wide ? "sm:col-span-2" : ""}>
+            // Left cell leads its neighbour so the row cascades in; the
+            // wide tile sits alone on its row and needs no offset.
+            <Reveal
+              key={project.slug}
+              y={28}
+              delay={wide ? 0 : (i % 2) * 0.09}
+              className={wide ? "sm:col-span-2" : ""}
+            >
               <ProjectTile
                 project={project}
                 wide={wide}
+                index={i}
                 onPointerEnter={() => setHovering(true)}
                 onPointerLeave={() => setHovering(false)}
               />
-            </div>
+            </Reveal>
           );
         })}
       </div>

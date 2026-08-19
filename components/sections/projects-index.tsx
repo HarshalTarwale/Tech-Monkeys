@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 import { CATEGORY_LABEL, ProjectTile } from "@/components/ui/project-tile";
 import { Shell } from "@/components/ui/shell";
@@ -102,35 +102,72 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
           })}
         </div>
 
-        {/* Asymmetric grid: every third tile spans both columns, so the
-            rhythm breaks rather than reading as a uniform catalogue. */}
+        {/* Asymmetric grid, so the page reads as a curated selection rather
+            than a uniform catalogue:
+              - tile 0 is the lead, full width and taller
+              - after it, every third tile spans both columns
+            The rhythm is measured from index 1 (`j` below) so the lead
+            tile doesn't throw the pattern out by one. Both rules key off
+            position, never a hardcoded slug, so filtering can't leave the
+            grid without a lead or with two wide tiles side by side.
+
+            Tiles reveal on scroll rather than on mount, so the page builds
+            as you move down it instead of having already finished before
+            you arrive. Keying on `filter` as well as slug remounts the grid
+            when a category is picked, so the same cascade replays and the
+            filter feels like it did something. */}
         <div
           className={`grid gap-x-5 gap-y-14 sm:grid-cols-2 ${cursorEnabled ? "cursor-none" : ""}`}
         >
-          <AnimatePresence mode="popLayout" initial={false}>
-            {visible.map((project, i) => (
+          {visible.map((project, i) => {
+            const featured = i === 0;
+            const j = i - 1;
+            const wide = !featured && j % 3 === 2;
+            const tile = (
+              <ProjectTile
+                project={project}
+                wide={wide}
+                featured={featured}
+                index={i}
+                onPointerEnter={() => setHovering(true)}
+                onPointerLeave={() => setHovering(false)}
+              />
+            );
+            const span = featured || wide ? "sm:col-span-2" : "";
+
+            // Reduced motion branches the whole element rather than blanking
+            // the animation props: `useReducedMotion()` returns null for one
+            // render, so a props-only guard mounts at opacity 0 and then
+            // loses the `whileInView` that would have revealed it — the
+            // content never comes back. Same fix as reveal.tsx.
+            if (reduced) {
+              return (
+                <div key={project.slug} className={span}>
+                  {tile}
+                </div>
+              );
+            }
+
+            return (
               <motion.div
-                key={project.slug}
-                layout={!reduced}
-                initial={reduced ? undefined : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? undefined : { opacity: 0, y: -12 }}
+                key={`${filter}-${project.slug}`}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
                 transition={{
-                  duration: reduced ? 0 : 0.45,
+                  duration: 0.65,
                   ease: [0.22, 1, 0.36, 1],
-                  delay: reduced ? 0 : (i % 3) * 0.05,
+                  // Left cell leads its neighbour, so a row cascades in
+                  // rather than snapping as one block. Full-width tiles sit
+                  // alone on their row and never need the offset.
+                  delay: featured || wide ? 0 : (i % 2) * 0.09,
                 }}
-                className={i % 3 === 2 ? "sm:col-span-2" : ""}
+                className={span}
               >
-                <ProjectTile
-                  project={project}
-                  wide={i % 3 === 2}
-                  onPointerEnter={() => setHovering(true)}
-                  onPointerLeave={() => setHovering(false)}
-                />
+                {tile}
               </motion.div>
-            ))}
-          </AnimatePresence>
+            );
+          })}
         </div>
 
         {visible.length === 0 && (
