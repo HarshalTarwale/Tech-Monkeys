@@ -51,7 +51,7 @@ export function ServiceHighlights({
                     <Icon className="h-8 w-8 text-ink transition-colors duration-300 group-hover:text-accent" />
                     {/* z-10 so the scaled-up digit paints over the icon and
                         body copy rather than being clipped behind them. */}
-                    <span className="relative z-10 inline-block origin-top-right font-mono text-[13px] text-accent-deep transition-[color,scale] duration-500 ease-out group-hover:scale-[2] group-hover:text-accent">
+                    <span className="relative z-10 inline-block origin-center font-mono text-[13px] text-accent-deep transition-[color,scale] duration-500 ease-out group-hover:scale-[2] group-hover:text-accent">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>

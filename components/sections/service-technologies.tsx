@@ -64,7 +64,7 @@ export function ServiceTechnologies({
                       re-tuned for a dark background: z-10 so the enlarged
                       digit paints over neighbouring content instead of
                       being clipped by it. */}
-                  <span className="relative z-10 inline-block origin-top-right font-mono text-[10px] tabular-nums text-accent transition-transform duration-500 ease-out group-hover:scale-[2]">
+                  <span className="relative z-10 inline-block origin-center font-mono text-[10px] tabular-nums text-accent transition-transform duration-500 ease-out group-hover:scale-[2]">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>

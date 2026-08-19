@@ -36,7 +36,7 @@ export const site = {
 export const nav = [
   { label: "Services", href: "/#capabilities", hasDropdown: true },
   { label: "Projects", href: "/projects" },
-  { label: "About", href: "/#divisions" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/#contact" },
 ] as const;
 
@@ -44,6 +44,6 @@ export const nav = [
 export const footerNav = [
   { label: "Services", href: "/#capabilities" },
   { label: "Projects", href: "/projects" },
-  { label: "About", href: "/#divisions" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/#contact" },
 ] as const;

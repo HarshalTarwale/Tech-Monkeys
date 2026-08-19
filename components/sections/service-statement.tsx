@@ -26,8 +26,12 @@ import type { ServiceDetail } from "@/lib/content";
  */
 export function ServiceStatement({
   statement,
+  eyebrow = "The problem",
 }: {
   statement: ServiceDetail["statement"];
+  /** Overridden by the About page, which reuses this block for its own
+   *  closing statement rather than duplicating the layout. */
+  eyebrow?: string;
 }) {
   return (
     <section className="relative overflow-hidden bg-ink px-5 py-24 md:px-10 md:py-32">
@@ -40,7 +44,7 @@ export function ServiceStatement({
       <Shell className="relative">
         <Reveal>
           <span className="font-mono text-[11px] uppercase tracking-[.2em] text-accent">
-            The problem
+            {eyebrow}
           </span>
         </Reveal>
 

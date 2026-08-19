@@ -1,3 +1,4 @@
+import { about } from "@/content/about";
 import { divisions, projects } from "@/content/projects";
 import { services } from "@/content/services";
 import { serviceDetails } from "@/content/services/details";
@@ -109,6 +110,11 @@ export function getDivision(segment: Segment): Division | undefined {
  */
 export function getTestimonials(): Testimonial[] {
   return [];
+}
+
+/** About-page content. See content/about.ts for sourcing notes. */
+export function getAbout() {
+  return about;
 }
 
 export { footerNav, nav, site };
