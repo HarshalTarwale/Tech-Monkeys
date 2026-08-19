@@ -27,8 +27,6 @@ export function SmoothScroll() {
     void import("lenis").then(({ default: Lenis }) => {
       if (cancelled) return;
       lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-      // TEMP DEBUG — removed before this file is finalized.
-      (window as unknown as { __lenis: unknown }).__lenis = lenis;
 
       const raf = (time: number) => {
         lenis?.raf(time);
