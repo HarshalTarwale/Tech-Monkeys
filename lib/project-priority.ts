@@ -4,6 +4,15 @@ export const PROJECT_INDEX_FILTERS = [
   {
     key: "all",
     label: "All work",
+    // "autobreeze" was already listed under "enterprises" but absent from
+    // "All work" — the more visible inconsistency, since that tab's name
+    // promises every project on show. Added here.
+    //
+    // "vedic-group" is deliberately absent from every group in this file,
+    // at the client's explicit instruction ("dont add vedic group"). It
+    // still lives in content/projects/index.ts and still passes the
+    // publication gate — this page's curation is what excludes it, so
+    // re-listing the slug here is all that's needed to bring it back.
     slugs: [
       "cloak",
       "dmd-properties",
@@ -27,6 +36,7 @@ export const PROJECT_INDEX_FILTERS = [
       "mindforge",
       "enabled",
       "pacific-pearl-hotels",
+      "autobreeze",
     ],
   },
   {

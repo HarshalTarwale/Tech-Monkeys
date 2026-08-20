@@ -33,17 +33,21 @@ import { projects } from "../content/projects/index.ts";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "..", "public", "projects");
 
-// Width matches the hover-embed's own logical viewport
-// (components/ui/project-tile.tsx's EMBED_WIDTH), so the static cover and
-// the live embed show the same layout rather than two different crops.
+// 1440x900 — a real, extremely common laptop resolution (16:10), not the
+// 4:3 this used to be. Width matches the hover-embed's own logical
+// viewport (components/ui/project-tile.tsx's EMBED_WIDTH), so the static
+// cover and the live embed show the same layout rather than two different
+// crops.
 //
-// The 4:3 height is deliberate. Every tile in the grid is 4:3 or wider, and
-// covers are pinned to `object-top` — so a 4:3 source is either shown whole
-// (in a 4:3 tile) or cropped only from the bottom (in a wider one). Nothing
-// is ever cropped horizontally, which is what was chopping the sides off
-// each project's hero. Capture taller than this and 4:3 tiles start cropping
-// sideways again; capture wider and the hero loses its lower half.
-const VIEWPORT = { width: 1280, height: 960 };
+// The 4:3 predecessor (1280x960) was the actual cause of a reported
+// "images look chopped" complaint: no real hero section is designed for a
+// squarish 4:3 box, so capturing one into that ratio was cropping content
+// no real visitor on a real laptop would ever see cropped. Tile aspect
+// ratios in project-tile.tsx were changed to match this viewport — regular
+// tiles are exactly 8:5 (1440/900, zero crop), wide/featured tiles are
+// 16:9 (a hair wider, so only ever a small trim off the bottom, never the
+// sides).
+const VIEWPORT = { width: 1440, height: 900 };
 
 // Retina capture. The featured tile renders ~1360px wide on a 1440 viewport,
 // so a 1x source would be upscaled and visibly soft — the "not clear" part
@@ -73,6 +77,41 @@ const page = await browser.newPage({
   deviceScaleFactor: DEVICE_SCALE,
 });
 
+// Best-effort cookie/consent banner dismissal. A handful of the real
+// client sites (EU/UK-facing ones especially) show one of these on first
+// load, and it sits directly on top of the hero — exactly the kind of
+// "other issue" behind captures that "aren't looking that good". This is
+// deliberately generic (common button text across common consent
+// libraries) rather than one selector per site, and every step is
+// wrapped so a banner that isn't found — most sites don't have one —
+// never blocks or slows the capture.
+async function dismissConsentBanner(page) {
+  const selectors = [
+    'button:has-text("Accept all")',
+    'button:has-text("Accept All")',
+    'button:has-text("Accept")',
+    'button:has-text("I agree")',
+    'button:has-text("I Agree")',
+    'button:has-text("Got it")',
+    'button:has-text("Allow all")',
+    '#onetrust-accept-btn-handler',
+    '[aria-label="Accept cookies"]',
+  ];
+  for (const selector of selectors) {
+    try {
+      const btn = page.locator(selector).first();
+      if (await btn.isVisible({ timeout: 800 })) {
+        await btn.click({ timeout: 800 });
+        await page.waitForTimeout(300);
+        return;
+      }
+    } catch {
+      // Not present, not visible, or not clickable in time — try the
+      // next one. A missing banner is the common case, not an error.
+    }
+  }
+}
+
 const results = [];
 for (const project of targets) {
   const dest = join(OUT_DIR, `${project.slug}.jpg`);
@@ -86,10 +125,11 @@ for (const project of targets) {
     // back to whatever painted, same principle as the tile's own timeout.
     console.warn(`  ${project.slug}: networkidle timed out, capturing anyway`);
   }
+  await dismissConsentBanner(page);
   await page.waitForTimeout(SETTLE_MS);
   // Explicit clip: some sites set a body height that makes Playwright's
-  // default capture taller than the viewport, which would break the 4:3
-  // contract the tile crops rely on.
+  // default capture taller than the viewport, which would break the
+  // aspect-ratio contract the tiles rely on (see VIEWPORT above).
   await page.screenshot({
     path: dest,
     type: "jpeg",

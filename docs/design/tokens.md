@@ -959,3 +959,96 @@ the `mt-9` spacing exactly with nothing left over from the old reserve.
 hero.tsx entirely — nothing left to crossfade. `active`/`index` off the
 division list went with them; only `display` (the typed substring) is
 still read from the cycle.
+
+---
+
+## /projects tiles: hover swap removed, zoom, capture ratio, curation (2026-08-21)
+
+### The hover "glitch" was the image genuinely changing
+
+Reported as a glitch and first diagnosed as stale React state on remount.
+That diagnosis was wrong — or rather, incomplete. A client before/after
+screenshot pair made the real cause obvious: **the two pictures are not
+the same picture.**
+
+The tile showed a static screenshot at rest and faded a live `<iframe>` of
+the real site over it on hover. Several of these sites run rotating hero
+carousels, so the live frame arrived on a *different slide* than the one
+captured — OnlineBlinds went from "Day and Night Blinds" to "Premium
+Vertical Blinds" mid-hover — at a slightly different layout and scroll
+position, with a "LIVE" badge appearing on top. No amount of tuning the
+fade or debouncing the mount fixes that, because the content itself
+differs. It read as a glitch because it effectively was one: the picture
+changed out from under the cursor.
+
+The live embed is gone. Hover now shows the same image, 1% larger, over
+700ms. Verified by screenshotting the same tile region at rest and after
+1.6s of hover: identical slide, identical layout, identical content —
+only the scale differs.
+
+This also removes **the last iframe on the entire site** (audited: 0
+across all 14 routes). Cross-origin iframes in these grids were measured
+earlier in this project blocking the main thread 1.1-1.4s and were the
+confirmed cause of a scroll-stall bug; hover-only mounting was the
+compromise that kept the feature alive. With it gone the grid is a plain
+image grid — nothing to load on hover, nothing to abort, nothing to
+thrash, no debounce needed, and the state machine (`embedActive`,
+`loaded`, `failed`, `box`, the ResizeObserver, the load-timeout effect,
+`canHover`) deleted with it.
+
+`project.video` support is intentionally kept: a silent screen-recording
+is the one hover medium that would show the *same* content rather than
+different content. Nothing sets it yet.
+
+### Zoom: 1.03 -> 1.015 -> 1.01
+
+Two rounds. Landed at 1% over a 700ms ease-out — at the threshold of
+perceptible, per "very very little zoom". The duration matters as much as
+the amount; the same 1% arriving in 150ms still reads as a snap.
+
+### Captures were 4:3 — no real hero section is designed for that
+
+The cause of "some portion is chopped".
+`scripts/capture-project-screenshots.mjs` captured at 1280x960 (4:3, a
+ratio no modern responsive hero targets), so every capture cropped content
+a real visitor would never see cropped. Now 1440x900 — a real, common
+laptop resolution — with tile ratios matched to it: regular tiles are
+`aspect-8/5` (1440/900, mathematically zero crop), wide/featured stay
+`aspect-video` (16:9, a hair wider, so the only crop anywhere is a small
+trim off the bottom of those two — never the sides).
+
+Also added best-effort cookie/consent-banner dismissal before each capture
+(generic button text across common consent libraries, every step wrapped
+so a missing banner — the common case — never blocks the run). Several of
+these client sites are EU/UK-facing and were plausibly showing a banner
+over the hero at capture time.
+
+All 24 re-captured at the new resolution against the sites' real domains,
+which also fixed a quieter problem: some covers still dated from the old
+Vercel deployment URLs, so the image no longer necessarily matched what
+`project.url` links to.
+
+### Curation
+
+`lib/project-priority.ts` hand-curates which slugs appear per filter tab,
+independently of the publication gate in lib/content.ts. `autobreeze` was
+listed under "Enterprises" but missing from "All work" — the more visible
+inconsistency, since that tab's name promises everything. Added.
+
+`vedic-group` is deliberately absent from every group, at the client's
+explicit instruction ("dont add vedic group"). It remains in
+content/projects/index.ts and still passes the publication gate; this
+page's curation is the only thing excluding it, so re-listing the slug is
+all that would be needed to bring it back. /projects now shows 23.
+
+### Blue tint
+
+`group-hover:bg-accent/10` full-tile wash, removed outright at the
+client's request. Confirmed zero occurrences in served markup.
+
+Verified: clean typecheck/lint/build; 23 tiles with AutoBreeze present and
+Vedic Group absent; hover screenshot comparison shows the same slide and
+layout before and during hover; zero iframes across all 14 routes; no
+LIVE/Loading badge anywhere; hover scale confirmed at 1.01 in served
+markup; all routes audited clean (no overflow, no broken images, one
+h1/one main each, no console errors, no failed requests).
