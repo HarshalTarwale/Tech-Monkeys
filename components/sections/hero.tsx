@@ -40,18 +40,25 @@ export function Hero({ divisions }: { divisions: Division[] }) {
   return (
     <section
       id="top"
-      // h-screen (not min-h-screen) so max-h actually takes effect: with
-      // min-height, min always wins over a smaller max-height per the CSS
-      // spec, so min-h-screen + max-h silently ignored the cap on
+      // Height is handled differently per breakpoint, on purpose.
+      //
+      // Below `xl` the headline runs to three lines (the animated word
+      // sits on its own line there — see the note on it below), so the
+      // section uses `min-h-screen`: it fills the viewport when there is
+      // room and grows when there isn't, instead of a hard `h-screen`
+      // clipping the CTA row off the bottom on shorter devices.
+      //
+      // From `xl` up the headline is two lines again, so it is `h-screen`
+      // with a cap — plus `min-h-0` to clear the smaller-screen
+      // min-height, because min always beats a smaller max-height per the
+      // CSS spec and the cap would otherwise be silently ignored on
       // ultrawide/4K screens (measured: still rendered at a full 1440px).
-      // height + max-height caps it correctly there while still filling
-      // the viewport on any screen shorter than the cap.
       //
       // justify-center, not justify-between: the marquee that used to
       // anchor the bottom of this section is gone, and centring keeps the
       // content from sitting pinned to the top with a large dead gap
       // below it.
-      className="grain relative flex h-screen max-h-225 flex-col justify-center px-5 pb-10 pt-28 md:px-10"
+      className="grain relative flex min-h-screen flex-col justify-center px-5 pb-16 pt-28 md:px-10 xl:min-h-0 xl:h-screen xl:max-h-225 xl:pb-10"
     >
       <div className="relative z-10 mx-auto w-full max-w-shell">
         <div className="mb-8 font-mono text-xs uppercase tracking-[.22em] text-accent-deep">
@@ -87,7 +94,25 @@ export function Hero({ divisions }: { divisions: Division[] }) {
               actually made earlier versions feel rough was uneven timing
               between them, and that is fixed in the hook — see the
               requestAnimationFrame note there. */}
-          <span className="-my-1 relative inline-flex h-[1em] items-center overflow-hidden bg-accent px-3 align-baseline">
+          {/* Below `xl` this is a block on its own line, not inline after
+              "for".
+
+              Inline, the box starts at whatever x the preceding text
+              happens to end at — and since the box is an unbreakable
+              inline unit that grows as it types, a longer word reflows
+              onto a new line mid-cycle. Measured across the real
+              animation: at 1024px "startups" and "corporates" sat at
+              x=574 while "enterprises" dropped to x=52, so the word
+              visibly jumped position and line partway through the loop.
+              At 768px it happened a word earlier.
+
+              The breakpoint is measured, not guessed: the longest word
+              only stops reflowing from ~1100px up, so `xl` (1280px) is
+              the first standard breakpoint with real margin. Below it,
+              all three words share one left edge on every phone and
+              tablet. `w-fit` keeps the accent block hugging the word
+              rather than stretching the whole row. */}
+          <span className="-my-1 relative mt-2 flex h-[1em] w-fit items-center overflow-hidden bg-accent px-3 align-baseline xl:mt-0 xl:inline-flex">
             <span
               aria-hidden="true"
               className="inline-flex items-center whitespace-nowrap text-white"

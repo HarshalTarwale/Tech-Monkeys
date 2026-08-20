@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { SmartLink } from "@/components/ui/smart-link";
-import { footerNav, nav, site } from "@/lib/content";
+import { nav, site } from "@/lib/content";
 import type { Service, ServiceCategory } from "@/lib/content";
 
 /**
@@ -31,6 +31,8 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  /** Services disclosure inside the mobile panel — collapsed by default. */
+  const [mobileServices, setMobileServices] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -194,43 +196,91 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* Mobile panel. Animates on max-height so it never shifts the page. */}
+      {/* Mobile panel. Animates on max-height so it never shifts the page,
+          and scrolls internally once open rather than growing past the
+          viewport. */}
       <div
-        className={`overflow-hidden border-t border-line bg-bone/95 transition-[max-height,opacity] duration-300 ease-out md:hidden ${
-          mobileOpen ? "max-h-[70vh] opacity-100" : "max-h-0 opacity-0"
+        className={`border-t border-line bg-bone/95 transition-[max-height,opacity] duration-300 ease-out md:hidden ${
+          mobileOpen
+            ? "max-h-[80vh] overflow-y-auto opacity-100"
+            : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
         <nav className="flex flex-col px-5 py-4">
-          {footerNav.map((item) => (
-            <SmartLink
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className="border-b border-line py-3 text-xs uppercase tracking-[.18em] text-muted transition-colors last:border-0 hover:text-accent"
-            >
-              {item.label}
-            </SmartLink>
-          ))}
+          {nav.map((item) =>
+            "hasDropdown" in item && item.hasDropdown ? (
+              /* Services is a disclosure, not ten links dumped inline.
+                 Listing every service directly pushed the four actual
+                 nav destinations off the top of the panel and made the
+                 menu a wall of text — the whole point of a mobile menu
+                 is to fit on the screen. */
+              <div key={item.href}>
+                <button
+                  type="button"
+                  onClick={() => setMobileServices((v) => !v)}
+                  aria-expanded={mobileServices}
+                  className="flex w-full items-center justify-between border-b border-line py-3 text-xs uppercase tracking-[.18em] text-muted transition-colors hover:text-accent"
+                >
+                  {item.label}
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    aria-hidden="true"
+                    className={`shrink-0 transition-transform duration-300 ${
+                      mobileServices ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path d="M2 3.5 5 6.5 8 3.5" />
+                  </svg>
+                </button>
 
-          <div className="mt-4 grid grid-cols-1 gap-px bg-line">
-            {services.map((service) => (
+                {/* 0fr -> 1fr grid transition, the same disclosure
+                    mechanism as service-faq.tsx: it animates to the
+                    content's real height without measuring anything or
+                    hardcoding a max-height that would clip the list. */}
+                <div
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                    mobileServices ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="flex flex-col border-b border-line py-1">
+                      {services.map((service) => (
+                        <SmartLink
+                          key={service.slug}
+                          href={
+                            serviceDetailSlugs.includes(service.slug)
+                              ? `/services/${service.slug}`
+                              : "/#capabilities"
+                          }
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-3 py-2.5 text-sm text-ink transition-colors hover:text-accent"
+                        >
+                          <span className="font-mono text-[10px] text-accent-deep">
+                            {service.index}
+                          </span>
+                          {service.title}
+                        </SmartLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
               <SmartLink
-                key={service.slug}
-                href={
-                  serviceDetailSlugs.includes(service.slug)
-                    ? `/services/${service.slug}`
-                    : "/#capabilities"
-                }
+                key={item.href}
+                href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 bg-bone px-1 py-2.5 text-sm text-ink"
+                className="border-b border-line py-3 text-xs uppercase tracking-[.18em] text-muted transition-colors last:border-0 hover:text-accent"
               >
-                <span className="font-mono text-[10px] text-accent-deep">
-                  {service.index}
-                </span>
-                {service.title}
+                {item.label}
               </SmartLink>
-            ))}
-          </div>
+            ),
+          )}
         </nav>
       </div>
     </header>

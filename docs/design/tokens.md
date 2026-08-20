@@ -869,3 +869,57 @@ to completion, erases to empty, types "corporates", erases, types
 "enterprises", erases, loops back to "startups"; reduced-motion confirmed
 static (identical text before and 4s after); sr-only text confirmed
 present with all three names; all 14 routes audited clean.
+
+---
+
+## Responsive pass: hero word position + mobile services menu (2026-08-20)
+
+### The hero word jumped position between breakpoints
+
+Client reported the animated word starting "on the side of *for*" and
+dropping to its own line as it grew. Measured across the real cycle by
+sampling the accent block's left edge at each viewport, it was worse than
+described — the word moved at tablet and laptop widths too:
+
+- **768px** — "startups" sat inline at x=471, "corporates" and
+  "enterprises" wrapped to x=52
+- **1024px** — "startups"/"corporates" at x=574, "enterprises" at x=52
+
+Inline, the block starts wherever the preceding text happens to end, and
+because it is an unbreakable inline unit that grows as it types, a longer
+word reflows onto a new line *partway through the loop*. So the position
+depended on both the viewport and which word was showing.
+
+Fixed by making the block a `w-fit` block on its own line below `xl`, so
+every word starts from the same left edge. **The breakpoint is measured,
+not guessed**: sampling the real cycle at 1024/1100/1200/1280/1366/1440
+showed the longest word only stops reflowing from ~1100px up, so `xl`
+(1280px) is the first standard breakpoint with real margin.
+
+Verified after: one identical left edge across the whole cycle at 320,
+390, 430, 768, 820, 1024, 1280 and 1440px.
+
+Section height had to follow. Below `xl` the headline is three lines
+rather than two, and a hard `h-screen` clipped the CTA row on shorter
+devices — it is now `min-h-screen` there, with `xl:min-h-0 xl:h-screen
+xl:max-h-225` restoring the capped full-height treatment where the
+headline is two lines again. The `min-h-0` matters: min always beats a
+smaller max-height per the CSS spec, so without it the 225 cap is
+silently ignored on ultrawide screens.
+
+### Mobile menu listed all ten services inline
+
+The mobile panel dumped every service as a link, pushing the four actual
+nav destinations down a wall of text. Services is now a disclosure —
+collapsed by default, `aria-expanded` on the trigger, chevron rotating on
+open — using the same `0fr -> 1fr` grid transition as service-faq.tsx, so
+it animates to the content's real height without measuring anything or
+hardcoding a max-height that would clip the list. The panel itself gained
+`overflow-y-auto` when open so a long list scrolls inside the menu rather
+than growing past the viewport.
+
+Measured: mobile nav 195px collapsed, 604px expanded.
+
+Verified: **66 checks** (11 viewport widths from 320px to 1920px x 6
+routes) with zero horizontal overflow, zero broken images, exactly one
+`h1` and one `main` per page, no console errors and no failed requests.
