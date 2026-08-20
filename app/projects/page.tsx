@@ -11,6 +11,7 @@ import {
   getServiceDetailSlugs,
   getServices,
 } from "@/lib/content";
+import { arrangeProjectsForProjectIndex } from "@/lib/project-priority";
 
 export const metadata: Metadata = {
   title: "Our work",
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
  */
 export default function ProjectsPage() {
   const projects = getProjects();
+  const projectIndexTotal = arrangeProjectsForProjectIndex(projects, "all").length;
 
   return (
     <>
@@ -40,7 +42,7 @@ export default function ProjectsPage() {
         serviceDetailSlugs={getServiceDetailSlugs()}
       />
       <PageMain>
-        <ProjectsHero total={projects.length} />
+        <ProjectsHero total={projectIndexTotal} />
         <ProjectsIndex projects={projects} />
         <ServiceCta />
         {/* Footer only — ServiceCta above already carries the closing CTA. */}

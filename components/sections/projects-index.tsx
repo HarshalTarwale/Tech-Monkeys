@@ -3,12 +3,15 @@
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
-import { CATEGORY_LABEL, ProjectTile } from "@/components/ui/project-tile";
+import { ProjectTile } from "@/components/ui/project-tile";
 import { Shell } from "@/components/ui/shell";
 import { useViewCursor } from "@/components/ui/view-cursor";
-import type { Project, ServiceCategory } from "@/lib/content";
-
-type Filter = ServiceCategory | "all";
+import type { Project } from "@/lib/content";
+import {
+  arrangeProjectsForProjectIndex,
+  getProjectIndexFilters,
+  type ProjectIndexFilter,
+} from "@/lib/project-priority";
 
 /**
  * The /projects index: filter bar plus an asymmetric project grid, with a
@@ -21,16 +24,16 @@ type Filter = ServiceCategory | "all";
  * over each tile with a large circular "View" label tracking the pointer
  * in its place.
  *
- * Filters are derived from the projects actually present, never from the
- * full `ServiceCategory` union, so a category with nothing published can't
- * render a tab that leads to an empty grid.
+ * Filters follow the client-approved priority groups for this page. Each tab
+ * still resolves through the publishable project list, so the publication
+ * gate in lib/content.ts remains intact.
  *
  * The "View site" cursor bubble comes from `useViewCursor`, shared with the
  * homepage work section — see that hook for why it's gated the way it is.
  */
 export function ProjectsIndex({ projects }: { projects: Project[] }) {
   const reduced = useReducedMotion();
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<ProjectIndexFilter>("all");
   const {
     enabled: cursorEnabled,
     handleMove,
@@ -38,22 +41,11 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
     cursor,
   } = useViewCursor();
 
-  // Only categories that actually have published work get a tab.
-  const filters = useMemo(() => {
-    const present = [...new Set(projects.map((p) => p.category))];
-    return [
-      { key: "all" as Filter, label: "All work", count: projects.length },
-      ...present.map((c) => ({
-        key: c as Filter,
-        label: CATEGORY_LABEL[c],
-        count: projects.filter((p) => p.category === c).length,
-      })),
-    ];
-  }, [projects]);
+  const filters = useMemo(() => getProjectIndexFilters(projects), [projects]);
+  const total = filters.find((item) => item.key === "all")?.count ?? 0;
 
   const visible = useMemo(
-    () =>
-      filter === "all" ? projects : projects.filter((p) => p.category === filter),
+    () => arrangeProjectsForProjectIndex(projects, filter),
     [projects, filter],
   );
 
@@ -72,7 +64,7 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
               {String(visible.length).padStart(2, "0")}
             </span>
             <span className="mx-1.5 text-line-strong">/</span>
-            {String(projects.length).padStart(2, "0")} projects
+            {String(total).padStart(2, "0")} projects
           </span>
         </div>
 
