@@ -64,21 +64,6 @@ export function getInventoryCount(): { total: number; publishable: number } {
   return { total: projects.length, publishable: getProjects().length };
 }
 
-/**
- * Labels for the hero marquee.
- *
- * Uses approved client names when there are any. Until names are cleared for
- * publication it falls back to the sectors we work in, so the band is never
- * empty and never shows a name without permission.
- */
-export function getMarqueeItems(): string[] {
-  const named = getProjects().map((p) => p.name);
-  if (named.length >= 6) return named;
-
-  const sectors = Array.from(new Set(projects.map((p) => p.sector)));
-  return [...named, ...sectors];
-}
-
 export function getServices(): Service[] {
   return services;
 }

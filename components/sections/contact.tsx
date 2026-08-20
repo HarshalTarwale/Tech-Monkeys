@@ -1,6 +1,7 @@
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { Eyebrow, Shell } from "@/components/ui/shell";
+import { SmartLink } from "@/components/ui/smart-link";
 import { footerNav, site } from "@/lib/content";
 
 /**
@@ -81,9 +82,9 @@ export function Contact({
             {footerNav.map((item, i) => (
               <span key={item.href}>
                 {i > 0 && " · "}
-                <a href={item.href} className="hover:text-accent">
+                <SmartLink href={item.href} className="hover:text-accent">
                   {item.label}
-                </a>
+                </SmartLink>
               </span>
             ))}
           </div>

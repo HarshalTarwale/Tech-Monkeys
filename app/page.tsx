@@ -1,10 +1,11 @@
+import { PageMain } from "@/components/ui/page-main";
 import { Contact } from "@/components/sections/contact";
 import { HomeView } from "@/components/sections/home-view";
+import { SiteHeader } from "@/components/sections/site-header";
 import { Work } from "@/components/sections/work";
 import {
   getDivisions,
   getFeaturedProjects,
-  getMarqueeItems,
   getProjectsBySegment,
   getServiceDetailSlugs,
   getServices,
@@ -38,15 +39,19 @@ export default function Home() {
 
   return (
     <>
-      <HomeView
-        divisions={divisions}
+      <SiteHeader
         services={getServices()}
         serviceDetailSlugs={getServiceDetailSlugs()}
-        projectsBySegment={projectsBySegment}
-        marqueeItems={getMarqueeItems()}
       />
-      <Work projects={getFeaturedProjects(WORK_SECTION_LIMIT)} />
-      <Contact />
+      <PageMain>
+        <HomeView
+          divisions={divisions}
+          services={getServices()}
+          projectsBySegment={projectsBySegment}
+        />
+        <Work projects={getFeaturedProjects(WORK_SECTION_LIMIT)} />
+        <Contact />
+      </PageMain>
     </>
   );
 }

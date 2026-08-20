@@ -28,16 +28,31 @@ export const divisions: Division[] = [
 ];
 
 /**
- * Projects - every entry verified live on 2026-08-15.
- * See docs/project-inventory-verified.md for the audit.
+ * Projects — every entry re-verified live on 2026-08-20 (previous audit
+ * 2026-08-15). See docs/project-inventory-verified.md.
  *
- * `nameApproved` gates public use of a client's name. lib/content.ts filters
- * on it, so an unapproved project stays out of the rendered site even
- * though it sits in this file. Flip to true only once the client has
- * explicitly confirmed that name for public use.
+ * This is the complete set of deployed client work across the studio's
+ * GitHub. Re-checked against `github.com/it-techmonkey` on 2026-08-20: 34
+ * repos there, of which 24 have a live deployment with real content — all
+ * 24 are below. The remainder are deliberately absent and stay that way:
+ *   - `nexus`, `partyfud-frontend`, `enabled` (enabled-phi),
+ *     `enabled-ngo` (enabled-ngo-xi) — all still HTTP 404.
+ *   - `continental-backend`, `partyfud-backend`, `pacific_pearl`,
+ *     `continental` — backends with no deployed front end to show.
+ *   - `Zaak` — Flutter scaffold, never deployed.
+ *   - `TechMonkey-Website` — the studio's own site, not client work.
+ * Re-run the check before claiming this list is exhaustive again.
  *
- * TODO(client): outcome sentence, year and cover image for each approved
- * project.
+ * `nameApproved` gates public use of a client's name. lib/content.ts
+ * filters on it, so an unapproved project stays out of the rendered site
+ * even though it sits in this file. All 24 were cleared for publication by
+ * the client on 2026-08-20 ("add all the projects present on their
+ * github"). The flag stays in the model rather than being deleted: new
+ * work still defaults to unapproved, and any single client can be pulled
+ * back off the site by flipping one boolean.
+ *
+ * TODO(client): outcome sentence and year for each project. Cover images
+ * are done — all 24 captured by scripts/capture-project-screenshots.mjs.
  *
  * TODO(client): the Enterprises segment has exactly one real project
  * (FixNex). The client asked, pending real enterprise-tier work, to
@@ -167,8 +182,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web", "Search"],
     url: "https://skyran-amber.vercel.app",
+    image: "/projects/skyran.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "da-realty",
@@ -179,8 +195,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://da-reality.vercel.app",
+    image: "/projects/da-realty.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "credence-realtor",
@@ -191,8 +208,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://credence-realtor.vercel.app",
+    image: "/projects/credence-realtor.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "dmd-properties",
@@ -203,8 +221,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://dmd-properties-real-estate.vercel.app",
+    image: "/projects/dmd-properties.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "hometrack",
@@ -215,8 +234,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://www.hometrack.ae",
+    image: "/projects/hometrack.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   // borrowed into Enterprises pending real enterprise-tier work — see TODO above
   {
@@ -254,8 +274,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://harshaltarwale.github.io/Vedic-Group-of-Institutions/",
+    image: "/projects/vedic-group.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "enabled",
@@ -266,8 +287,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web", "Community"],
     url: "https://enabled-ngo.vercel.app",
+    image: "/projects/enabled.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "mindforge",
@@ -291,8 +313,9 @@ export const projects: Project[] = [
     category: "web",
     tags: ["Web"],
     url: "https://copilot-labs.vercel.app",
+    image: "/projects/copilot-labs.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "neuroholistic",
@@ -317,8 +340,9 @@ export const projects: Project[] = [
     category: "ecommerce",
     tags: ["E-commerce", "DTC"],
     url: "https://lumina-eta-nine.vercel.app",
+    image: "/projects/lumina.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "onlineblinds",
@@ -329,8 +353,9 @@ export const projects: Project[] = [
     category: "ecommerce",
     tags: ["E-commerce", "Configurator"],
     url: "https://online-blinds-express.vercel.app",
+    image: "/projects/onlineblinds.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "priceless-blinds",
@@ -341,8 +366,9 @@ export const projects: Project[] = [
     category: "ecommerce",
     tags: ["E-commerce"],
     url: "https://priceless-blinds.vercel.app",
+    image: "/projects/priceless-blinds.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
   {
     slug: "yournextblinds",
@@ -353,7 +379,8 @@ export const projects: Project[] = [
     category: "ecommerce",
     tags: ["E-commerce"],
     url: "https://yournextblinds-frontend.vercel.app",
+    image: "/projects/yournextblinds.jpg",
     status: "live",
-    nameApproved: false,
+    nameApproved: true,
   },
 ];

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { PageMain } from "@/components/ui/page-main";
 import { Contact } from "@/components/sections/contact";
 import { ProjectsHero } from "@/components/sections/projects-hero";
 import { ProjectsIndex } from "@/components/sections/projects-index";
@@ -38,11 +39,13 @@ export default function ProjectsPage() {
         services={getServices()}
         serviceDetailSlugs={getServiceDetailSlugs()}
       />
-      <ProjectsHero total={projects.length} />
-      <ProjectsIndex projects={projects} />
-      <ServiceCta />
-      {/* Footer only — ServiceCta above already carries the closing CTA. */}
-      <Contact showCta={false} />
+      <PageMain>
+        <ProjectsHero total={projects.length} />
+        <ProjectsIndex projects={projects} />
+        <ServiceCta />
+        {/* Footer only — ServiceCta above already carries the closing CTA. */}
+        <Contact showCta={false} />
+      </PageMain>
     </>
   );
 }

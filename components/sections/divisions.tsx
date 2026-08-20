@@ -11,6 +11,7 @@ import {
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
 import { ProjectShowcase } from "@/components/ui/project-showcase";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
+import { SmartLink } from "@/components/ui/smart-link";
 import type { Division, Project } from "@/lib/content";
 
 /** Cap per division — 1-4 proof points, cycled in the showcase carousel. */
@@ -78,12 +79,12 @@ function DivisionBlock({
           {/* No underline at rest; border-b-2 border-transparent reserves
               the same 2px of space so the line appearing on hover doesn't
               nudge anything below it. */}
-          <a
+          <SmartLink
             href="/contact"
             className="group mt-9 inline-flex items-center gap-2 border-b-2 border-transparent pb-1 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:border-accent hover:text-accent"
           >
             Engage this division <Arrow spin />
-          </a>
+          </SmartLink>
         </div>
 
         <div className={flipped ? "lg:order-1" : ""}>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { SmartLink } from "@/components/ui/smart-link";
 import { footerNav, nav, site } from "@/lib/content";
 import type { Service, ServiceCategory } from "@/lib/content";
 
@@ -125,7 +126,7 @@ export function SiteHeader({
                     <ul className="grid grid-cols-2 gap-px bg-line">
                       {services.map((service, i) => (
                         <li key={service.slug}>
-                          <a
+                          <SmartLink
                             href={
                               serviceDetailSlugs.includes(service.slug)
                                 ? `/services/${service.slug}`
@@ -147,7 +148,7 @@ export function SiteHeader({
                             <span className="text-sm font-medium leading-snug text-ink group-hover:text-white">
                               {service.title}
                             </span>
-                          </a>
+                          </SmartLink>
                         </li>
                       ))}
                     </ul>
@@ -155,13 +156,13 @@ export function SiteHeader({
                 </div>
               </div>
             ) : (
-              <a
+              <SmartLink
                 key={item.href}
                 href={item.href}
                 className="text-xs uppercase tracking-[.18em] text-muted transition-colors hover:text-accent"
               >
                 {item.label}
-              </a>
+              </SmartLink>
             ),
           )}
         </nav>
@@ -201,19 +202,19 @@ export function SiteHeader({
       >
         <nav className="flex flex-col px-5 py-4">
           {footerNav.map((item) => (
-            <a
+            <SmartLink
               key={item.href}
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className="border-b border-line py-3 text-xs uppercase tracking-[.18em] text-muted transition-colors last:border-0 hover:text-accent"
             >
               {item.label}
-            </a>
+            </SmartLink>
           ))}
 
           <div className="mt-4 grid grid-cols-1 gap-px bg-line">
             {services.map((service) => (
-              <a
+              <SmartLink
                 key={service.slug}
                 href={
                   serviceDetailSlugs.includes(service.slug)
@@ -227,7 +228,7 @@ export function SiteHeader({
                   {service.index}
                 </span>
                 {service.title}
-              </a>
+              </SmartLink>
             ))}
           </div>
         </nav>

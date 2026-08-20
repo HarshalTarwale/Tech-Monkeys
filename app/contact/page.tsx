@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ContactHero } from "@/components/sections/contact-hero";
 import { ContactServices } from "@/components/sections/contact-services";
 import { ContactSteps } from "@/components/sections/contact-steps";
+import { PageMain } from "@/components/ui/page-main";
 import { Contact } from "@/components/sections/contact";
 import { ServiceFaq } from "@/components/sections/service-faq";
 import { SiteHeader } from "@/components/sections/site-header";
@@ -51,15 +52,17 @@ export default function ContactPage() {
         serviceDetailSlugs={getServiceDetailSlugs()}
       />
 
-      <ContactHero />
-      <ContactSteps steps={contact.steps} />
-      <ContactServices
-        services={getServices()}
-        serviceDetailSlugs={getServiceDetailSlugs()}
-      />
-      <ServiceFaq faqs={contact.faqs} eyebrow="Questions" />
+      <PageMain>
+        <ContactHero />
+        <ContactSteps steps={contact.steps} />
+        <ContactServices
+          services={getServices()}
+          serviceDetailSlugs={getServiceDetailSlugs()}
+        />
+        <ServiceFaq faqs={contact.faqs} eyebrow="Questions" />
 
-      <Contact ctaEyebrow="Start here" ctaHref={`mailto:${site.email}`} />
+        <Contact ctaEyebrow="Start here" ctaHref={`mailto:${site.email}`} />
+      </PageMain>
     </>
   );
 }

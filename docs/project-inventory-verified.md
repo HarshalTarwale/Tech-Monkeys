@@ -60,3 +60,47 @@ confirm with client before claiming Mobile App Development as a headline service
 ## Still needed from client
 
 Client-name permission, outcome sentence, year, and cover image per project.
+
+---
+
+## Re-verification — 2026-08-20
+
+Re-checked `github.com/it-techmonkey` (34 repos) and loaded every homepage
+URL in a real browser, reading the rendered `<title>` and body length so a
+deployed-but-blank page could not pass as live.
+
+**Result: 24 live client projects — all 24 are in `content/projects/index.ts`.**
+Nothing on the GitHub account was missing from the site. What was missing
+was publication: 12 of the 24 were still held behind `nameApproved: false`.
+The client cleared all of them on 2026-08-20 ("add all the projects present
+on their github"), so all 24 now publish.
+
+Newly published in that pass: SKYRAN, Da Realty, Credence Realtor, DMD
+Properties, Hometrack, Vedic Group of Institutions, Enabled, Copilot Labs,
+Lumina, OnlineBlinds, Priceless Blinds, YourNextBlinds. Cover screenshots
+captured for all 24 via `npm run capture:projects`.
+
+### Still dead — confirmed 404 again, do not publish
+
+`nexus` (nexus-brown-two), `partyfud-frontend` (partyfud-frontend-sigma),
+`enabled` (enabled-phi), `enabled-ngo` (enabled-ngo-xi). Note `enabledngo`
+→ `enabled-ngo.vercel.app` **is** live and is the one published as
+"Enabled"; the two similarly-named dead deploys are older attempts.
+
+### No deployment — nothing to show
+
+`continental-backend`, `partyfud-backend`, `pacific_pearl`, `continental`
+(backends, no front end), `Zaak` (Flutter scaffold, never deployed).
+
+### Excluded on purpose
+
+`TechMonkey-Website` (tech-monkey-website.vercel.app) is the studio's own
+site, not client work, so it does not belong in a portfolio of client
+projects.
+
+### URL note
+
+`Fixnex`'s repo homepage now points at `fixnex-seven.vercel.app`, but
+`fixnex.ae` is also live and serves the same product. The content file
+keeps `fixnex.ae` — the real branded domain reads better than a Vercel
+subdomain, and both were confirmed 200.

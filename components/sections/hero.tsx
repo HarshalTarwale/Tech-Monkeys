@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import type { Division, Segment } from "@/lib/content";
-import { Marquee } from "@/components/ui/marquee";
+import { SmartLink } from "@/components/ui/smart-link";
 
 /**
  * Full-height hero.
@@ -28,12 +28,10 @@ export function Hero({
   divisions,
   mode,
   setMode,
-  marqueeItems,
 }: {
   divisions: Division[];
   mode: Segment;
   setMode: (mode: Segment) => void;
-  marqueeItems: string[];
 }) {
   const active = divisions.find((d) => d.segment === mode) ?? divisions[0];
   const reduced = useReducedMotion();
@@ -47,7 +45,12 @@ export function Hero({
       // ultrawide/4K screens (measured: still rendered at a full 1440px).
       // height + max-height caps it correctly there while still filling
       // the viewport on any screen shorter than the cap.
-      className="grain relative flex h-screen max-h-225 flex-col justify-between px-5 pb-10 pt-28 md:px-10"
+      //
+      // justify-center, not justify-between: the marquee that used to
+      // anchor the bottom of this section is gone, and centring keeps the
+      // content from sitting pinned to the top with a large dead gap
+      // below it.
+      className="grain relative flex h-screen max-h-225 flex-col justify-center px-5 pb-10 pt-28 md:px-10"
     >
       <div className="relative z-10 mx-auto w-full max-w-shell">
         <div className="mb-8 font-mono text-xs uppercase tracking-[.22em] text-accent-deep">
@@ -103,12 +106,12 @@ export function Hero({
           >
             Explore divisions
           </a>
-          <a
+          <SmartLink
             href="/contact"
             className="inline-flex h-14 items-center rounded-full border border-ink/20 px-7 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
           >
             Start a project
-          </a>
+          </SmartLink>
 
           {/* Height is locked to the CTA pills beside it: those are
               py-4 + text-sm + border = 56px. Matching h-14 here and
@@ -137,8 +140,6 @@ export function Hero({
           </div>
         </div>
       </div>
-
-      <Marquee items={marqueeItems} />
     </section>
   );
 }

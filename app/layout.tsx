@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { NavProgress } from "@/components/motion/nav-progress";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 // Via lib/content, not content/site directly — AGENTS.md: nothing reads
 // content/ straight, so the publication gate can never be bypassed.
@@ -36,6 +37,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <SmoothScroll />
+        {/* Sits in the layout, not a page: the layout persists across
+            navigations, so the bar survives the route change it is
+            reporting on. */}
+        <NavProgress />
         {children}
       </body>
     </html>

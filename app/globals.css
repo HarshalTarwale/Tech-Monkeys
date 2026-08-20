@@ -97,16 +97,6 @@
   }
 }
 
-/* Logo band. Track is duplicated in markup, so -50% loops seamlessly. */
-@keyframes marquee {
-  0% {
-    transform: translate(0);
-  }
-  100% {
-    transform: translate(-50%);
-  }
-}
-
 /* Rotating mark in the capabilities panel. */
 .loop-mark {
   border: 1px solid var(--tm-accent);
@@ -154,8 +144,64 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* --- Page transitions -----------------------------------------------
+   A thin accent line sweeps across the top of the viewport on every
+   internal navigation; the page content itself does not animate at all.
+   See components/motion/nav-progress.tsx for how the reference was
+   measured and why the restraint is the point.
+
+   An earlier version animated the page content instead (a blur-and-lift
+   crossfade via the View Transitions API). It was removed: the client
+   asked specifically for the reference's behaviour, and the reference
+   holds the outgoing page perfectly still and lets the bar carry the
+   movement. Animating both fights itself.
+   -------------------------------------------------------------------- */
+
+/* Sweep in from the left, over 200ms.
+
+   The curve is fitted to the reference rather than picked by feel. Its
+   bar was sampled every frame across a real navigation and the resulting
+   progress points — 22% of the distance at 18% of the duration, 80% at
+   50%, 96% at 75% — match CSS `ease` (cubic-bezier(.25,.1,.25,1)) almost
+   exactly. A first attempt used cubic-bezier(.25,1,.5,1), which measured
+   91% at the halfway mark: noticeably snappier than the reference, and
+   the difference is visible as a flick rather than a sweep. */
+.tm-navbar-in {
+  animation: 200ms ease both tm-navbar-sweep;
+}
+
+/* Leaves by fading rather than sliding back out — the reference simply
+   removes the element, but on a 3px line a hard cut reads as a glitch and
+   a short fade is indistinguishable from it otherwise. */
+.tm-navbar-out {
+  animation: 160ms ease-out both tm-navbar-fade;
+}
+
+@keyframes tm-navbar-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes tm-navbar-fade {
+  to {
+    opacity: 0;
+  }
+}
+
 /* --- Motion constraint: honoured globally, non-negotiable. --- */
 @media (prefers-reduced-motion: reduce) {
+  /* The nav bar still appears (it is useful feedback that a navigation
+     is happening) but stops travelling — it is a 3px line holding
+     position, which carries no motion-sickness risk, rather than
+     something sweeping across the viewport. */
+  .tm-navbar-in {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -163,9 +209,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .animate-marquee {
-    animation: none !important;
   }
 }

@@ -4,6 +4,7 @@ import { AboutHero } from "@/components/sections/about-hero";
 import { AboutPrinciples } from "@/components/sections/about-principles";
 import { AboutStats } from "@/components/sections/about-stats";
 import { AboutStory } from "@/components/sections/about-story";
+import { PageMain } from "@/components/ui/page-main";
 import { Contact } from "@/components/sections/contact";
 import { ServiceCta } from "@/components/sections/service-cta";
 import { ServiceStatement } from "@/components/sections/service-statement";
@@ -40,18 +41,20 @@ export default function AboutPage() {
         serviceDetailSlugs={getServiceDetailSlugs()}
       />
 
-      <AboutHero />
-      <AboutStats stats={about.stats} />
-      <AboutStory />
-      <AboutPrinciples principles={about.principles} />
+      <PageMain>
+        <AboutHero />
+        <AboutStats stats={about.stats} />
+        <AboutStory />
+        <AboutPrinciples principles={about.principles} />
 
-      {/* Reuses the service pages' ink statement block rather than a
-          near-identical copy — same {lead, emphasis, support} shape. */}
-      <ServiceStatement statement={about.statement} eyebrow="Why it works" />
+        {/* Reuses the service pages' ink statement block rather than a
+            near-identical copy — same {lead, emphasis, support} shape. */}
+        <ServiceStatement statement={about.statement} eyebrow="Why it works" />
 
-      <ServiceCta />
-      {/* Footer only — ServiceCta above already carries the closing CTA. */}
-      <Contact showCta={false} />
+        <ServiceCta />
+        {/* Footer only — ServiceCta above already carries the closing CTA. */}
+        <Contact showCta={false} />
+      </PageMain>
     </>
   );
 }

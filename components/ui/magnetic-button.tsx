@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Arrow } from "@/components/ui/shell";
+import { SmartLink } from "@/components/ui/smart-link";
 
 /**
  * Primary CTA with two effects layered:
@@ -77,7 +78,10 @@ export function MagneticButton({
   }
 
   return (
-    <a
+    // SmartLink, not a bare <a>: this is the site's primary CTA and points
+    // at /contact from almost everywhere, so a plain anchor made the most
+    // important navigation on the site a full page reload.
+    <SmartLink
       ref={ref}
       href={href}
       onMouseMove={handleMove}
@@ -105,6 +109,6 @@ export function MagneticButton({
       </span>
 
       <Arrow spin className="relative z-10" />
-    </a>
+    </SmartLink>
   );
 }

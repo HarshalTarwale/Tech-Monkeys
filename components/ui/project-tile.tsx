@@ -149,7 +149,7 @@ export function ProjectTile({
 
   return (
     <a
-      href={project.url ?? "/#contact"}
+      href={project.url ?? "/contact"}
       target={project.url ? "_blank" : undefined}
       rel={project.url ? "noreferrer" : undefined}
       onPointerEnter={handleEnter}

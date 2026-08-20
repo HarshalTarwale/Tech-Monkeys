@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageMain } from "@/components/ui/page-main";
 import { Contact } from "@/components/sections/contact";
 import { ServiceCta } from "@/components/sections/service-cta";
 import { ServiceFaq } from "@/components/sections/service-faq";
@@ -66,25 +67,27 @@ export default async function ServiceDetailPage(
         serviceDetailSlugs={getServiceDetailSlugs()}
       />
 
-      <ServiceHero service={service} detail={detail} />
-      <ServiceStatement statement={detail.statement} />
-      <ServiceHighlights highlights={detail.highlights} />
-      <ServiceProcess steps={detail.process} />
+      <PageMain>
+        <ServiceHero service={service} detail={detail} />
+        <ServiceStatement statement={detail.statement} />
+        <ServiceHighlights highlights={detail.highlights} />
+        <ServiceProcess steps={detail.process} />
 
-      {detail.technologies && detail.technologies.length > 0 && (
-        <ServiceTechnologies technologies={detail.technologies} />
-      )}
+        {detail.technologies && detail.technologies.length > 0 && (
+          <ServiceTechnologies technologies={detail.technologies} />
+        )}
 
-      <ServiceWork projects={getProjectsByCategory(service.slug)} />
+        <ServiceWork projects={getProjectsByCategory(service.slug)} />
 
-      {detail.faqs && detail.faqs.length > 0 && (
-        <ServiceFaq faqs={detail.faqs} />
-      )}
+        {detail.faqs && detail.faqs.length > 0 && (
+          <ServiceFaq faqs={detail.faqs} />
+        )}
 
-      <ServiceCta />
-      {/* Footer only — ServiceCta directly above already carries the
-          closing call to action. */}
-      <Contact showCta={false} />
+        <ServiceCta />
+        {/* Footer only — ServiceCta directly above already carries the
+            closing call to action. */}
+        <Contact showCta={false} />
+      </PageMain>
     </>
   );
 }

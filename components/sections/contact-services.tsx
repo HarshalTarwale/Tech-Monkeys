@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/motion/reveal";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
+import { SmartLink } from "@/components/ui/smart-link";
 import type { Service, ServiceCategory } from "@/lib/content";
 
 /**
@@ -34,7 +35,7 @@ export function ContactServices({
         <div className="grid border-l border-t border-line-strong sm:grid-cols-2">
           {services.map((service, i) => (
             <Reveal key={service.slug} delay={(i % 2) * 0.08} y={16}>
-              <a
+              <SmartLink
                 href={
                   serviceDetailSlugs.includes(service.slug)
                     ? `/services/${service.slug}`
@@ -57,7 +58,7 @@ export function ContactServices({
                   spin
                   className="mt-1 shrink-0 text-faint transition-colors duration-300 group-hover:text-accent"
                 />
-              </a>
+              </SmartLink>
             </Reveal>
           ))}
         </div>

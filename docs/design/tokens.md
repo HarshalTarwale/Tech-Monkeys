@@ -678,3 +678,95 @@ Verified: clean typecheck / lint / build; all 14 routes audited for
 horizontal overflow, broken images, missing alt, h1 count, unlabelled
 links and buttons, title/meta description, console errors and failed
 requests — all clean; every internal link target returns 200.
+
+---
+
+## Page transitions (2026-08-20)
+
+Client asked for tentwenty's page transition. A first attempt animated the
+page content (a blur-and-lift crossfade via React `<ViewTransition>` / the
+View Transitions API) and was rejected — so the reference was measured
+properly rather than approximated.
+
+### What the reference actually does
+
+Screencast a real navigation on tentwenty.com and sample the DOM every
+frame, and the transition turns out to be far more restrained than it
+looks:
+
+- a single `position: fixed` element, full viewport width, **3px tall**,
+  pinned to the very top (`y = 0`), above everything
+- it slides from `translateX(-100%)` to `0` over **~200ms**
+- it holds at full width ~200ms, then is removed (~420ms total life)
+- **the page content does not animate at all.** No fade, no blur, no
+  slide. The outgoing page holds perfectly still until the new one is
+  ready, then swaps.
+
+That last point is the entire character of it. The bar carries the
+movement so the content doesn't have to, which is exactly why it reads as
+calm rather than busy — and why animating the content as well fought
+against it. `components/motion/nav-progress.tsx` reproduces this.
+
+### Matching the curve
+
+The bar's x-position was sampled every frame on both sites and the curves
+compared directly. The reference's progress points — 22% of the distance
+at 18% of the duration, 80% at 50%, 96% at 75% — match CSS `ease`
+(`cubic-bezier(.25,.1,.25,1)`) almost exactly. A first pass used
+`cubic-bezier(.25,1,.5,1)`, which measured 91% at the halfway mark:
+snappier than the reference, and visibly a flick rather than a sweep.
+
+After switching to `ease`, the two are frame-for-frame identical — the
+sampled x-positions match at every step (-1440, -1338, -1122, -852, -611,
+-424, -284, -182, -108, -57, -24, -6, 0), landing at full width 3ms apart
+(reference +203ms, ours +200ms).
+
+Colour is our own accent (`#3D5AFE`), not the reference's `#4A48F3`.
+
+Two deliberate differences: the bar **fades** out over 160ms instead of
+being cut instantly (on a 3px line a hard cut reads as a glitch and is
+otherwise indistinguishable), and it is driven by a click event rather
+than `useLinkStatus` — every route here is static and prefetched, so a
+genuine pending state is skipped almost every time and the bar would
+rarely appear. `MIN_VISIBLE_MS` guarantees the sweep is seen even when a
+navigation resolves instantly, because this is a signature, not a spinner.
+A `MAX_VISIBLE_MS` safety valve stops it hanging if a navigation never
+lands, and modifier/middle clicks are ignored since those open a new tab
+and the current page never leaves.
+
+Under reduced motion the bar still appears (useful feedback that a
+navigation happened) but stops travelling — a 3px line holding position
+carries no motion-sickness risk.
+
+### The prerequisite nobody had noticed
+
+None of this could work at first, because an audit of every `<a>` found
+that **only the header wordmark and the capabilities list used
+`next/link`**. Every other internal link — the whole nav, the service
+dropdown, the footer, "Get in touch", "Start a project", "Engage this
+division", "View all projects" — was a plain `<a href="/...">`, i.e. a
+full cold page reload. The router never ran, nothing prefetched, and Lenis
+re-initialised on every click.
+
+`components/ui/smart-link.tsx` centralises the rule so it cannot drift
+again: `/route` → `next/link`, `#hash` → plain `<a>`, `mailto:`/external →
+plain `<a>` with rel/target. Every internal call site was converted. This
+is a large navigation-speed win independent of the transition.
+
+### Knock-on fixes
+
+- `SmoothScroll` resets Lenis on `pathname` change. A full reload used to
+  do this for free; client navigation does not, and Lenis holds its own
+  scroll value independent of `window.scrollY`, so without it every new
+  page opened scrolled halfway down. Skipped when the URL carries a hash.
+- `SiteHeader` was hoisted out of `HomeView` into `app/page.tsx`. It never
+  consumed `HomeView`'s `mode` state, so nothing was shared by keeping it
+  there.
+- Every page gained a `<main>` landmark (`components/ui/page-main.tsx`) —
+  the pages had none before.
+
+Verified: clean typecheck / lint / build; 5 navigation paths each show the
+bar and clean it up afterwards with zero full reloads and scroll reset to
+0; reduced-motion shows the bar at `x=0` (no travel); ctrl+click correctly
+does not trigger it; all 14 routes audited clean (no overflow, no broken
+images, one h1 and one main each, zero iframes, no console errors).

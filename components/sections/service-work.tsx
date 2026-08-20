@@ -1,6 +1,7 @@
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
 import { ProjectPanels } from "@/components/ui/project-panels";
 import { Arrow, Eyebrow, Shell } from "@/components/ui/shell";
+import { SmartLink } from "@/components/ui/smart-link";
 import type { Project } from "@/lib/content";
 
 /**
@@ -43,12 +44,12 @@ export function ServiceWork({ projects }: { projects: Project[] }) {
             <ProjectPanels projects={projects} />
 
             <div className="mt-14 text-center">
-              <a
+              <SmartLink
                 href="/projects"
                 className="group inline-flex items-center gap-2 border-b-2 border-transparent pb-1 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:border-accent hover:text-accent"
               >
                 View all projects <Arrow spin />
-              </a>
+              </SmartLink>
             </div>
           </>
         ) : (
