@@ -6,7 +6,7 @@ import { Work } from "@/components/sections/work";
 import {
   getDivisions,
   getFeaturedProjects,
-  getProjectsBySegment,
+  getFeaturedProjectsBySegment,
   getServiceDetailSlugs,
   getServices,
 } from "@/lib/content";
@@ -31,7 +31,7 @@ export default function Home() {
 
   const projectsBySegment = divisions.reduce<Record<string, Project[]>>(
     (acc, division) => {
-      acc[division.segment] = getProjectsBySegment(division.segment);
+      acc[division.segment] = getFeaturedProjectsBySegment(division.segment);
       return acc;
     },
     {},

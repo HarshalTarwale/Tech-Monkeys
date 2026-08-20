@@ -1,6 +1,6 @@
 import { about } from "@/content/about";
 import { contact } from "@/content/contact";
-import { divisions, projects } from "@/content/projects";
+import { divisionShowcase, divisions, projects } from "@/content/projects";
 import { services } from "@/content/services";
 import { serviceDetails } from "@/content/services/details";
 import { footerNav, nav, site } from "@/content/site";
@@ -46,6 +46,30 @@ export function getFeaturedProjects(limit = 4): Project[] {
 
 export function getProjectsBySegment(segment: Segment): Project[] {
   return getProjects().filter((p) => p.segment === segment);
+}
+
+/**
+ * Curated showcase list for the homepage Divisions section.
+ *
+ * Uses the explicit `divisionShowcase` slug list from content, so each
+ * division shows exactly the projects the client chose — regardless of
+ * the project's own `segment` (which drives the /projects filter page).
+ *
+ * Falls back to the first publishable project in the segment if no showcase
+ * config exists for that division.
+ */
+export function getFeaturedProjectsBySegment(segment: Segment): Project[] {
+  const slugs = divisionShowcase[segment];
+  if (slugs && slugs.length > 0) {
+    const publishable = getProjects();
+    // Preserve the order defined in divisionShowcase.
+    return slugs
+      .map((slug) => publishable.find((p) => p.slug === slug))
+      .filter((p): p is Project => p !== undefined)
+      .slice(0, 4);
+  }
+  // Fallback: first project in the segment.
+  return getProjectsBySegment(segment).slice(0, 1);
 }
 
 export function getProjectsByCategory(category: ServiceCategory): Project[] {

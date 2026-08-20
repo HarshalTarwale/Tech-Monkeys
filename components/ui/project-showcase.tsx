@@ -91,13 +91,15 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
         <div className="font-mono text-[10px] uppercase tracking-[.2em] text-faint">
           Selected engagements
         </div>
-        <div className="font-mono text-[10px] tabular-nums text-faint">
-          <span className="text-accent-deep">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span className="mx-1 text-line-strong">/</span>
-          {String(count).padStart(2, "0")}
-        </div>
+        {count > 1 && (
+          <div className="font-mono text-[10px] tabular-nums text-faint">
+            <span className="text-accent-deep">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="mx-1 text-line-strong">/</span>
+            {String(count).padStart(2, "0")}
+          </div>
+        )}
       </div>
 
       {/* Fixed-height stage. The card is absolutely positioned inside it so
@@ -133,68 +135,72 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
         </AnimatePresence>
       </div>
 
-      {/* Controls: prev/next plus direct-select dots. */}
-      <div className="mt-5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          {projects.map((p, i) => (
-            <button
-              key={p.slug}
-              type="button"
-              onClick={() => go(i, i > index ? 1 : -1)}
-              aria-label={`Show ${p.name}`}
-              aria-current={i === index}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === index
-                  ? "w-7 bg-accent"
-                  : "w-1.5 bg-line-strong hover:bg-faint"
-              }`}
-            />
-          ))}
-        </div>
+      {/* Controls: prev/next plus direct-select dots.
+          Hidden entirely when there is only one project — no navigation needed
+          and showing disabled arrows would imply there's more to see. */}
+      {count > 1 && (
+        <div className="mt-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {projects.map((p, i) => (
+              <button
+                key={p.slug}
+                type="button"
+                onClick={() => go(i, i > index ? 1 : -1)}
+                aria-label={`Show ${p.name}`}
+                aria-current={i === index}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === index
+                    ? "w-7 bg-accent"
+                    : "w-1.5 bg-line-strong hover:bg-faint"
+                }`}
+              />
+            ))}
+          </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => go(index - 1, -1)}
-            aria-label="Previous project"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => go(index - 1, -1)}
+              aria-label="Previous project"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => go(index + 1, 1)}
-            aria-label="Next project"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => go(index + 1, 1)}
+              aria-label="Next project"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

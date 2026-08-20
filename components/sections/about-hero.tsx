@@ -1,6 +1,6 @@
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { Eyebrow, Shell } from "@/components/ui/shell";
-import { getAbout, site } from "@/lib/content";
+import { getAbout } from "@/lib/content";
 
 /**
  * About-page opener. Quiet by design — the stat band immediately below is
@@ -28,7 +28,7 @@ export function AboutHero() {
         </p>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-          <MagneticButton href={`mailto:${site.email}`} size="lg">
+          <MagneticButton href="/contact#contact" size="lg">
             Talk to us
           </MagneticButton>
           <span className="font-mono text-[11px] uppercase tracking-[.2em] text-faint">

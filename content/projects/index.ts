@@ -9,7 +9,7 @@ export const divisions: Division[] = [
     segment: "startups",
     name: "Startups",
     focus: "Velocity",
-    body: "First build, first customers, first raise. We take a founder’s idea to a product that ships, stands up to real users and reads as credible in the room.",
+    body: "First build, first customers, first raise. We take a founder's idea to a product that ships, stands up to real users and reads as credible in the room.",
   },
   {
     id: "02",
@@ -26,6 +26,27 @@ export const divisions: Division[] = [
     body: "Long-horizon work for organisations that cannot afford downtime. Connected platforms, monitoring and automation built to be maintained for years.",
   },
 ];
+
+/**
+ * Explicit showcase lists for the homepage Divisions section.
+ *
+ * These slugs determine which projects appear in each division's carousel,
+ * independent of the project's own `segment`. This lets us place a project
+ * in the right filter on /projects while curating what the homepage shows.
+ *
+ * Max 4 per division (matches MAX_PREVIEWS in project-showcase.tsx).
+ * Order here is the display order in the carousel.
+ */
+export const divisionShowcase: Record<string, string[]> = {
+  startups: ["cloak"],
+  corporates: [
+    "dmd-properties",
+    "skyran",
+    "hometrack",
+    "continental-premium-properties",
+  ],
+  enterprises: ["onlineblinds", "fixnex", "neuroholistic", "lumina"],
+};
 
 /**
  * Projects — every entry re-verified live on 2026-08-20 (previous audit
@@ -61,6 +82,12 @@ export const divisions: Division[] = [
  * below) so the showcase carousel has 4 to cycle through instead of 1.
  * Revert their `segment` back to "corporates" once real enterprise
  * projects exist, or if the client decides otherwise.
+ *
+ * `featured` controls which projects appear in the homepage "Work,
+ * documented" section. Exactly three are featured:
+ *   - DMD Properties  (corporates)
+ *   - FixNex          (enterprises)
+ *   - NeuroHolistic   (startups)
  */
 export const projects: Project[] = [
   {
@@ -75,7 +102,6 @@ export const projects: Project[] = [
     image: "/projects/hyde-park-wood.jpg",
     status: "live",
     nameApproved: true,
-    featured: true,
   },
   {
     slug: "fixnex",
@@ -103,7 +129,6 @@ export const projects: Project[] = [
     image: "/projects/taldo.jpg",
     status: "live",
     nameApproved: true,
-    featured: true,
   },
   {
     slug: "saabri",
@@ -143,7 +168,6 @@ export const projects: Project[] = [
     image: "/projects/continental-premium-properties.jpg",
     status: "live",
     nameApproved: true,
-    featured: true,
   },
   // borrowed into Enterprises pending real enterprise-tier work — see TODO above
   {
@@ -224,6 +248,7 @@ export const projects: Project[] = [
     image: "/projects/dmd-properties.jpg",
     status: "live",
     nameApproved: true,
+    featured: true,
   },
   {
     slug: "hometrack",
