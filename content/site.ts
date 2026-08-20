@@ -11,6 +11,18 @@ export const site = {
   tagline: "Digital product partner",
   description:
     "Tech Monkeys is a Dubai digital studio building web platforms, commerce and software for startups, corporates and enterprises.",
+  /**
+   * Homepage hero support line. Segment-agnostic on purpose: the headline
+   * above it cycles through "startups" / "corporates" / "enterprises" on
+   * a loop, and the paragraph used to cycle with it (each division's own
+   * `body` from content/projects/index.ts). Client feedback: the changing
+   * paragraph "was not looking good" and read as unstable under a
+   * headline that was already moving — asked for one line that holds
+   * regardless of which word is showing. This says the one thing true of
+   * every division rather than picking a side.
+   */
+  heroIntro:
+    "We scope, build and ship every product ourselves — one team from first brief to launch, whether that's a founder's first release or the systems a large operation runs on every day.",
   url: "https://techmonkey.space",
   location: "United Arab Emirates",
   email: "hello@techmonkey.space", // TODO(client): confirm

@@ -923,3 +923,39 @@ Measured: mobile nav 195px collapsed, 604px expanded.
 Verified: **66 checks** (11 viewport widths from 320px to 1920px x 6
 routes) with zero horizontal overflow, zero broken images, exactly one
 `h1` and one `main` per page, no console errors and no failed requests.
+
+---
+
+## Hero paragraph: static line + CTA gap bug (2026-08-20)
+
+Client feedback: the paragraph under the headline was still changing
+alongside the typewriter word (each division's own `body` text,
+crossfading in). "Not looking good" — one thing on the page already
+animating on a loop was enough; a second thing changing under it read as
+unstable rather than lively.
+
+Replaced with `site.heroIntro` in content/site.ts — one segment-agnostic
+line, written to be true of every division rather than describing one of
+them, so nothing needs to change under the moving headline at all.
+
+**This also fixed a real, unreported layout bug.** The old block reserved
+height for the tallest division's paragraph by rendering all three
+`invisible` copies to measure against — but they were left in *normal
+document flow* rather than absolutely positioned on top of each other, so
+the container reserved height for all three paragraphs stacked
+vertically, not just the tallest one. That pushed the CTA row down by the
+combined height of the other two — measured at as much as ~150px of dead
+space depending on which division's text was longest. The client's
+"button is kind away from the main area" report was this bug; it showed
+identically on phone and desktop because it was a structural flow issue,
+not a breakpoint one.
+
+Fix, verified: paragraph confirmed identical across a full typewriter
+cycle (1 distinct text sampled, both desktop and mobile — was 3 before).
+Gap from paragraph to CTA row measured at a clean 36px on both, matching
+the `mt-9` spacing exactly with nothing left over from the old reserve.
+
+`useReducedMotion`, `AnimatePresence` and `motion.p` are gone from
+hero.tsx entirely — nothing left to crossfade. `active`/`index` off the
+division list went with them; only `display` (the typed substring) is
+still read from the cycle.

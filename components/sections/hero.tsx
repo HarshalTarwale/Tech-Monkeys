@@ -1,9 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-
 import { useTypewriterCycle } from "@/components/motion/use-typewriter-cycle";
 import { SmartLink } from "@/components/ui/smart-link";
+import { site } from "@/lib/content";
 import type { Division } from "@/lib/content";
 
 /**
@@ -16,8 +15,17 @@ import type { Division } from "@/lib/content";
  *
  * This replaced a manual switcher (three buttons, click to change the
  * word) at the client's request. The switcher's other job — driving which
- * division's `body` copy shows underneath — is now driven by the same
- * cycle instead of a click, crossfading in sync with each new word.
+ * division's `body` copy showed underneath — briefly moved to the same
+ * cycle instead of a click, crossfading a new paragraph in with each new
+ * word. That is gone too: client feedback was that a paragraph changing
+ * underneath a headline that was already animating "was not looking
+ * good", and it also had a real layout bug — the invisible copies kept to
+ * reserve height for the tallest paragraph were stacked in normal flow
+ * rather than layered on top of each other, so the block reserved height
+ * for all three paragraphs combined and pushed the CTA row down with it.
+ * `site.heroIntro` is one segment-agnostic line instead: no crossfade, no
+ * reserved-height trick needed, and nothing to disagree with the headline
+ * about.
  *
  * The highlight block has no width animation: it is a plain inline-flex
  * box sized to whatever is currently typed, so it grows and shrinks a
@@ -32,10 +40,8 @@ import type { Division } from "@/lib/content";
  * animation only starts after mount, so it cannot gate LCP.
  */
 export function Hero({ divisions }: { divisions: Division[] }) {
-  const reduced = useReducedMotion();
   const words = divisions.map((d) => d.name.toLowerCase());
-  const { display, index } = useTypewriterCycle(words);
-  const active = divisions[index] ?? divisions[0];
+  const { display } = useTypewriterCycle(words);
 
   return (
     <section
@@ -60,7 +66,12 @@ export function Hero({ divisions }: { divisions: Division[] }) {
       // below it.
       className="grain relative flex min-h-screen flex-col justify-center px-5 pb-16 pt-28 md:px-10 xl:min-h-0 xl:h-screen xl:max-h-225 xl:pb-10"
     >
-      <div className="relative z-10 mx-auto w-full max-w-shell">
+      {/* -translate-y shifts the whole block up off dead-centre, toward
+          the top third of the section — centring it exactly read as
+          sitting a little low under the fixed header. transform, not a
+          margin/padding change, so it costs no layout and the h-screen
+          height math above is unaffected. */}
+      <div className="relative z-10 mx-auto w-full max-w-shell translate-y-[-2.5vh]">
         <div className="mb-8 font-mono text-xs uppercase tracking-[.22em] text-accent-deep">
           Digital product partner · UAE
         </div>
@@ -139,33 +150,9 @@ export function Hero({ divisions }: { divisions: Division[] }) {
           {divisions.map((d) => d.name.toLowerCase()).join(", ")}
         </span>
 
-        <div className="relative mt-8 max-w-xl">
-          {/* Reserves the taller division's height so the CTA row below
-              never shifts as the copy changes length — the paragraphs are
-              absolutely stacked and only the active one is laid out for
-              real. */}
-          {divisions.map((d) => (
-            <p
-              key={d.segment}
-              aria-hidden={d.segment !== active.segment}
-              className="invisible text-lg leading-relaxed text-transparent"
-            >
-              {d.body}
-            </p>
-          ))}
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.p
-              key={active.segment}
-              initial={reduced ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={reduced ? undefined : { opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute inset-0 text-lg leading-relaxed text-muted"
-            >
-              {active.body}
-            </motion.p>
-          </AnimatePresence>
-        </div>
+        <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
+          {site.heroIntro}
+        </p>
 
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <a
