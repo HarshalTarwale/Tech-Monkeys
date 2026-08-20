@@ -770,3 +770,102 @@ bar and clean it up afterwards with zero full reloads and scroll reset to
 0; reduced-motion shows the bar at `x=0` (no travel); ctrl+click correctly
 does not trigger it; all 14 routes audited clean (no overflow, no broken
 images, one h1 and one main each, zero iframes, no console errors).
+
+---
+
+## Hero: typewriter word cycle (2026-08-20)
+
+Replaced the manual startups/corporates/enterprises pill switcher with an
+automatic type/erase cycle through the same three words, in the same
+accent-highlighted block in the headline.
+
+`components/motion/use-typewriter-cycle.ts`: a single self-scheduling
+`setTimeout` chain (not a `setInterval`, so timing can't drift or double
+up), typing at ~65ms/char, holding 2s once fully typed, erasing at
+~38ms/char (erasing at the typing speed read as sluggish once the word had
+already been seen), then a 300ms beat before the next word starts typing.
+
+**Getting this to feel right took four versions, and the instructive part
+is that the obvious suspect was wrong three times.**
+
+*v1 — Motion `layout` spring (120ms) on the block width.* Measured frame
+by frame, the text finished typing "startups" at t=94ms while the spring
+was still widening the box until t=226ms: the highlight permanently chased
+the letters ~130ms behind, and every new character interrupted the
+previous tween mid-flight. 85 distinct width values in one cycle.
+
+*v2 — no width animation.* Fixed the lag (21 distinct widths, each landing
+exactly with a text change) but traded it for a ~50px jump per keystroke.
+Read as steppy.
+
+*v3 — measured glide.* Kept the whole word in the DOM and animated only
+the block width, with the exact per-character pixel boundary measured via
+a `Range` over the text node and the transition duration matched to the
+current step interval. This measured beautifully — worst per-frame
+movement fell from ~50px to 22px — and was **the wrong thing to build**: a
+gliding edge clips mid-glyph, so letters slid into view a sliver at a time
+instead of appearing. That is a wipe, not a typewriter, and the client
+correctly called it out as such.
+
+*v4 — current.* Whole characters, block snapping to fit, and the real
+cause of the roughness addressed instead: **timing, not motion.** The
+`setTimeout` chain driving the cycle was producing character intervals of
+33, 50, 34, 50, 49, 50, 34ms against a nominal 45ms — `setTimeout`
+guarantees only a minimum delay, so each hop landed on whichever frame
+came next and error compounded down the chain. The letters were arriving
+in an uneven rhythm, which reads as jitter even when every frame is drawn
+perfectly.
+
+Two fixes together:
+
+1. The cycle is driven by `requestAnimationFrame` against real elapsed
+   time (`now - phaseStart`), so it is frame-accurate and cannot drift
+   however long it runs. State is pushed to React only when the character
+   count actually changes, so it re-renders ~14x/sec rather than 60.
+
+2. The intervals are set just *under* a whole number of 60Hz frames — 66ms
+   (~4 frames) and 49ms (~3). A character can only land on a frame
+   boundary, so an interval that doesn't divide evenly gets quantised
+   unevenly: 70ms alternated between 67ms and 84ms steps, and 45ms — almost
+   exactly between 2 and 3 frames — alternated 33ms and 50ms on every
+   keystroke. Both average out correctly and both feel wrong. Slightly
+   under a frame multiple, not over, because at exactly 4 frames the
+   elapsed time can land a floating-point whisker short and slip a frame.
+   Both values also divide cleanly at 120Hz (8 and 6 frames).
+
+Result: typing steps of 65-68ms and erase steps of 49-52ms with the
+84ms/34ms outliers gone, avg frame gap 16.6ms, **worst gap 19.2ms**, zero
+dropped frames. Perceived speed is unchanged — 66ms vs 70ms is not
+distinguishable by eye; the evenness is what reads as smooth.
+
+The paragraph beneath the headline used to change on click (tied to the
+switcher); it now crossfades in sync with the word cycle instead, via a
+small absolutely-stacked-invisible-paragraphs trick so the tallest
+division's copy reserves real height and the CTA row below never shifts
+as the text changes length.
+
+Two accessibility decisions, both deliberate:
+- The animated word is `aria-hidden`; a sibling `sr-only` span states all
+  three division names once, in full. Assistive tech gets one stable
+  sentence rather than a live region mutating every few dozen
+  milliseconds.
+- Under `prefers-reduced-motion`, the cycle does not run at all — the
+  first word renders once, fully typed, and nothing changes after that.
+  This is stricter than most reduced-motion handling on this site (which
+  usually keeps a plain crossfade): auto-advancing content the visitor
+  cannot pause is exactly what WCAG's "pause, stop, hide" guidance
+  targets, so the fix is to not run the cycle rather than run a gentler
+  version of it. The blinking caret is a separate concern — plain CSS
+  `@keyframes`, already covered by the global reduced-motion rule.
+
+`Hero` no longer takes `mode`/`setMode`: the cycle is entirely
+self-contained (it owns the current index internally), so the state that
+used to live in `HomeView` and get passed down was deleted rather than
+wired to the new mechanism. Nothing else ever consumed it.
+
+Verified: pill switcher confirmed removed from the DOM; sampled the typed
+text over a full cycle and confirmed the exact sequence — types "startups"
+to completion, erases to empty, types "corporates", erases, types
+"enterprises", erases, loops back to "startups"; reduced-motion confirmed
+static (identical text before and 4s after); sr-only text confirmed
+present with all three names; all 14 routes audited clean.

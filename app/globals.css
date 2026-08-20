@@ -85,6 +85,28 @@
 
 /* --- Motion primitives, matched to the design reference. --- */
 
+/* Typewriter caret in the hero (components/motion/use-typewriter-cycle).
+   A plain CSS animation rather than a Motion component: it runs
+   continuously and independently of the typing/erasing state machine, so
+   there's nothing gained from JS driving it, and the global
+   reduced-motion rule below already stops it for free. */
+@keyframes tm-caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.tm-caret {
+  animation: tm-caret-blink 1s step-end infinite;
+}
+
 /* Hero highlight word. */
 @keyframes pop {
   0% {
