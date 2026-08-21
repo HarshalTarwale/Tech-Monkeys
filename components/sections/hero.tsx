@@ -155,12 +155,18 @@ export function Hero({ divisions }: { divisions: Division[] }) {
         </p>
 
         <div className="mt-9 flex flex-wrap items-center gap-3">
-          <a
-            href="#divisions"
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              const target = document.getElementById("divisions");
+              if (target) {
+                target.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
             className="inline-flex h-14 items-center rounded-full bg-ink px-7 text-sm font-medium text-white transition-colors hover:bg-accent"
           >
             Explore divisions
-          </a>
+          </button>
           <SmartLink
             href="/contact"
             className="inline-flex h-14 items-center rounded-full border border-ink/20 px-7 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
