@@ -25,8 +25,8 @@ export const site = {
     "We scope, build and ship every product ourselves — one team from first brief to launch, whether that's a founder's first release or the systems a large operation runs on every day.",
   url: "https://techmonkey.space",
   location: "United Arab Emirates",
-  email: "hello@techmonkey.space", // TODO(client): confirm
-  github: "https://github.com/it-techmonkey",
+  email: "varunc@techmonkey.space",
+  phone: "+971 585605980",
 } as const;
 
 /**

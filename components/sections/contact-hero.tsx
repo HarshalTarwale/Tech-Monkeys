@@ -44,6 +44,12 @@ export function ContactHero() {
               >
                 {site.email} <Arrow spin />
               </a>
+              <a
+                href={`tel:${site.phone.replace(/\s+/g, "")}`}
+                className="group inline-flex w-fit items-center gap-2 text-sm font-medium uppercase tracking-[.14em] text-ink transition-colors hover:text-accent"
+              >
+                {site.phone} <Arrow spin />
+              </a>
               <span className="font-mono text-[11px] uppercase tracking-[.2em] text-faint">
                 Or write directly, if you&apos;d rather · {about.location}
               </span>

@@ -95,12 +95,10 @@ export function Contact({
             </a>
             <br />
             <a
-              href={site.github}
-              target="_blank"
-              rel="noreferrer"
+              href={`tel:${site.phone.replace(/\s+/g, "")}`}
               className="hover:text-accent"
             >
-              GitHub
+              {site.phone}
             </a>
           </div>
         </div>

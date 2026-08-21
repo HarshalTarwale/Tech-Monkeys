@@ -8,11 +8,17 @@ import { site } from "@/lib/content";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
+const MIN_FILL_TIME_MS = 1500;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /**
- * The /contact enquiry form — posts to `app/api/contact/route.ts`, which
- * delivers it via Resend. See the TODO(client) there: nothing sends until
- * an API key is configured, which this surfaces as a plain error message
- * rather than a silent failure.
+ * The /contact enquiry form — submits directly to Web3Forms from the
+ * browser. Web3Forms' free tier rejects server-to-server calls ("Use our
+ * API in client side or contact support with server IP address (Pro plan
+ * is required)"), so this can't be proxied through our own API route —
+ * the access key is intentionally public (`NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`),
+ * which is how Web3Forms' client-side flow is designed to work.
  *
  * Deliberately short: four inputs, one of them optional, and only one that
  * takes real thought to answer — every additional field on an enquiry form
@@ -24,9 +30,9 @@ type Status = "idle" | "submitting" | "success" | "error";
  *
  * Two anti-spam checks travel with every submission: a honeypot field
  * (`website`, visually hidden, real visitors never touch it) and
- * `startedAt` (captured on mount, so the server can reject anything
- * answered faster than a person plausibly could). Both are enforced
- * server-side — this component's only job is to carry them along.
+ * `startedAt` (captured on mount, rejecting anything answered faster than a
+ * person plausibly could). Both run client-side now — there's no server
+ * hop left to enforce them in.
  */
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -44,35 +50,72 @@ export function ContactForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus("submitting");
     setErrors({});
     setErrorMessage("");
 
     const data = new FormData(event.currentTarget);
-    const payload = {
-      name: data.get("name"),
-      email: data.get("email"),
-      company: data.get("company"),
-      message: data.get("message"),
-      website: data.get("website"),
-      startedAt: startedAt.current,
-    };
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const company = String(data.get("company") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+    const honeypot = String(data.get("website") ?? "").trim();
+
+    // Silently accept-and-drop honeypot hits and anything submitted
+    // suspiciously fast — a real error response just teaches a bot what to
+    // fix, whereas a fake success ends the conversation.
+    const tooFast = Date.now() - startedAt.current < MIN_FILL_TIME_MS;
+    if (honeypot || tooFast) {
+      setStatus("success");
+      return;
+    }
+
+    const fieldErrors: Record<string, string> = {};
+    if (!name) fieldErrors.name = "Tell us your name.";
+    if (!email) fieldErrors.email = "Add an email so we can reply.";
+    else if (!EMAIL_RE.test(email)) fieldErrors.email = "That email doesn't look right.";
+    if (!message) fieldErrors.message = "Add a line or two about the project.";
+    else if (message.length < 10)
+      fieldErrors.message = "A little more detail helps — a sentence or two.";
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      setErrorMessage("Check the highlighted fields.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("submitting");
+
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      setErrorMessage(
+        `Enquiries aren't wired up to send yet — please email us directly at ${site.email} instead.`,
+      );
+      setStatus("error");
+      return;
+    }
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(WEB3FORMS_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          access_key: accessKey,
+          from_name: name,
+          email,
+          company: company || undefined,
+          message,
+          subject: `New enquiry — ${name}`,
+        }),
       });
       const body = await res.json();
 
-      if (res.ok) {
+      if (res.ok && body.success) {
         setStatus("success");
         return;
       }
 
-      setErrors(body.fields ?? {});
-      setErrorMessage(body.error || "Something went wrong — please try again.");
+      setErrorMessage(body.message || "Something went wrong — please try again.");
       setStatus("error");
     } catch {
       setErrorMessage(
