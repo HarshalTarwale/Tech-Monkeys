@@ -128,7 +128,33 @@ export function ProjectShowcase({ projects }: { projects: Project[] }) {
                     opacity: { duration: 0.5, ease: "easeOut" },
                   }
             }
-            className="absolute inset-0 overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-[0_28px_64px_-20px_rgba(20,20,22,.45)] transition-[border-color,box-shadow] duration-300 hover:border-accent hover:shadow-[0_28px_64px_-20px_rgba(61,90,254,.4)]"
+            // ── Swipe-to-navigate (touch / pointer drag) ──────────────────
+            // drag="x" lets the card follow the finger. dragConstraints at
+            // zero keeps it from flying off — the spring snaps it back.
+            // dragElastic adds just enough give to feel bounded rather than
+            // rigid. On release, onDragEnd fires: if the pan offset or the
+            // release velocity clears the threshold we treat it as a swipe
+            // and advance the carousel in that direction.
+            drag={count > 1 ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_e, info) => {
+              const OFFSET_THRESHOLD = 60;  // px
+              const VELOCITY_THRESHOLD = 400; // px/s
+              const { offset, velocity } = info;
+              if (
+                offset.x < -OFFSET_THRESHOLD ||
+                velocity.x < -VELOCITY_THRESHOLD
+              ) {
+                go(index + 1, 1);
+              } else if (
+                offset.x > OFFSET_THRESHOLD ||
+                velocity.x > VELOCITY_THRESHOLD
+              ) {
+                go(index - 1, -1);
+              }
+            }}
+            className="absolute inset-0 touch-pan-y overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-[0_28px_64px_-20px_rgba(20,20,22,.45)] transition-[border-color,box-shadow] duration-300 hover:border-accent hover:shadow-[0_28px_64px_-20px_rgba(61,90,254,.4)]"
           >
             <ShowcaseFrame project={project} />
           </motion.div>
