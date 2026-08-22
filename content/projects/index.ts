@@ -45,7 +45,7 @@ export const divisionShowcase: Record<string, string[]> = {
     "hometrack",
     "continental-premium-properties",
   ],
-  enterprises: ["onlineblinds", "fixnex", "neuroholistic", "lumina"],
+  enterprises: ["onlineblinds", "hyde-park-wood", "lumina", "yournextblinds"],
 };
 
 /**

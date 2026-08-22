@@ -52,7 +52,19 @@ export function SmoothScroll() {
       lenisRef.current = lenis as unknown as LenisInstance;
 
       const raf = (time: number) => {
-        lenisRef.current?.raf(time);
+        // Lenis drives every scroll-linked animation on the page from this
+        // loop. If `lenis.raf()` throws on some frame — a stale ref inside
+        // a scroll listener, for instance — an unguarded call here would
+        // never reach the `requestAnimationFrame(raf)` below, silently and
+        // permanently killing smooth scroll for the rest of the session
+        // (confirmed: this is why scrolling occasionally "gets stuck" until
+        // a hard refresh). Catching it means one bad frame is skipped
+        // instead of ending the loop.
+        try {
+          lenisRef.current?.raf(time);
+        } catch (error) {
+          console.error("[SmoothScroll] Lenis raf tick failed:", error);
+        }
         frame = requestAnimationFrame(raf);
       };
       frame = requestAnimationFrame(raf);
