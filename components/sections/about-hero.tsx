@@ -23,7 +23,15 @@ export function AboutHero() {
           {about.heading.emphasis}
         </h1>
 
-        <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
+        {/* Subheading, not a paragraph aside — the reach across four
+            markets is a credential a prospect outside the UAE needs to
+            clock immediately, so it gets its own visual weight rather than
+            being folded into the intro sentence below. */}
+        <p className="mt-5 max-w-xl text-xl font-semibold tracking-[-.01em] text-accent-deep md:text-2xl">
+          Present across UAE, UK, USA and Europe.
+        </p>
+
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
           {about.intro}
         </p>
 

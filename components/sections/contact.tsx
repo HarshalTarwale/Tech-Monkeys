@@ -76,6 +76,8 @@ export function Contact({
             {site.tagline}
             <br />
             {site.location}
+            <br />
+            <span className="text-faint">UAE · UK · USA · Europe</span>
           </div>
 
           <div className="md:text-center">

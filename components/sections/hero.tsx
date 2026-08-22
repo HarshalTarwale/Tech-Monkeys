@@ -73,7 +73,7 @@ export function Hero({ divisions }: { divisions: Division[] }) {
           height math above is unaffected. */}
       <div className="relative z-10 mx-auto w-full max-w-shell translate-y-[-2.5vh]">
         <div className="mb-8 font-mono text-xs uppercase tracking-[.22em] text-accent-deep">
-          Digital product partner · UAE
+          Digital product partner · UAE · UK · USA · Europe
         </div>
 
         {/* clamp(floor, fluid, ceiling), not plain vw — vw alone has no

@@ -42,6 +42,8 @@
 export interface AboutStat {
   value: string;
   label: string;
+  /** Optional quiet detail line shown under the label, e.g. naming which countries. */
+  sublabel?: string;
 }
 
 export interface AboutPrinciple {
@@ -67,7 +69,7 @@ export const about = {
   stats: [
     { value: "45+", label: "Clients served" },
     { value: "78+", label: "Projects delivered" },
-    { value: "4+", label: "Countries" },
+    { value: "4+", label: "Countries", sublabel: "UAE · UK · USA · Europe" },
     { value: "10", label: "Services under one roof" },
   ] as AboutStat[],
 

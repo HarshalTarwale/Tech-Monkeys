@@ -36,6 +36,11 @@ export function AboutStats({ stats }: { stats: AboutStat[] }) {
               <div className="mt-3 font-mono text-[10px] uppercase tracking-[.2em] text-white/45">
                 {stat.label}
               </div>
+              {stat.sublabel && (
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-[.14em] text-white/30">
+                  {stat.sublabel}
+                </div>
+              )}
             </div>
           ))}
         </div>
