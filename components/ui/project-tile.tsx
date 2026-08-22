@@ -214,16 +214,10 @@ export function ProjectTile({
  * exists to show. Above the name it is always ink-on-bone.
  */
 function IndexMark({ index, featured }: { index?: number; featured?: boolean }) {
-  if (index === undefined) return null;
+  if (!featured) return null;
   return (
     <span className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[.2em]">
-      <span className="text-faint">{String(index + 1).padStart(2, "0")}</span>
-      {featured && (
-        <>
-          <span className="h-px w-6 bg-line-strong" />
-          <span className="text-accent-deep">Featured project</span>
-        </>
-      )}
+      <span className="text-accent-deep">Featured project</span>
     </span>
   );
 }

@@ -42,7 +42,6 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
   } = useViewCursor();
 
   const filters = useMemo(() => getProjectIndexFilters(projects), [projects]);
-  const total = filters.find((item) => item.key === "all")?.count ?? 0;
 
   const visible = useMemo(
     () => arrangeProjectsForProjectIndex(projects, filter),
@@ -59,13 +58,6 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
             "550 + projects" readout. */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line-strong pb-5 font-mono text-[10px] uppercase tracking-[.2em] text-faint">
           <span>Selected engagements</span>
-          <span>
-            <span className="text-accent-deep">
-              {String(visible.length).padStart(2, "0")}
-            </span>
-            <span className="mx-1.5 text-line-strong">/</span>
-            {String(total).padStart(2, "0")} projects
-          </span>
         </div>
 
         <div className="flex flex-wrap gap-2 py-8">
@@ -84,11 +76,6 @@ export function ProjectsIndex({ projects }: { projects: Project[] }) {
                 }`}
               >
                 {f.label}
-                <span
-                  className={`font-mono text-[10px] ${active ? "text-white/50" : "text-faint"}`}
-                >
-                  {String(f.count).padStart(2, "0")}
-                </span>
               </button>
             );
           })}
